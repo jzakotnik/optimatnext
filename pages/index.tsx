@@ -1,6 +1,5 @@
 import type { NextPage } from "next";
 import Head from "next/head";
-import Image from "next/image";
 
 import { ThemeProvider, createTheme } from "@mui/material/styles";
 import CssBaseline from "@mui/material/CssBaseline";
@@ -12,7 +11,7 @@ const darkTheme = createTheme({
   },
 });
 
-const Home: NextPage = () => {
+const Home: NextPage = ({ traffic }): any => {
   return (
     <ThemeProvider theme={darkTheme}>
       <CssBaseline />
@@ -29,7 +28,7 @@ const Home: NextPage = () => {
           justifyContent="space-around"
           alignItems="center"
         >
-          <Grid item>a</Grid>
+          <Grid item>{JSON.stringify(traffic)}</Grid>
           <Grid item>b</Grid>
           <Grid item>c</Grid>
         </Grid>
@@ -49,4 +48,11 @@ const Home: NextPage = () => {
   );
 };
 
+export const getServerSideProps = async () => {
+  const res = await fetch(process.env.NEXT_PUBLIC_API_URL + "/api/traffic");
+  const traffic = await res.json();
+
+  // Pass data to the page via props
+  return { props: { traffic } };
+};
 export default Home;
