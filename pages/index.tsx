@@ -11,7 +11,11 @@ const darkTheme = createTheme({
   },
 });
 
-const Home: NextPage = ({ traffic }): any => {
+type IndexPageProps = {
+  traffic: any;
+};
+
+export default function Home({ traffic }: IndexPageProps) {
   return (
     <ThemeProvider theme={darkTheme}>
       <CssBaseline />
@@ -46,7 +50,7 @@ const Home: NextPage = ({ traffic }): any => {
       </Grid>
     </ThemeProvider>
   );
-};
+}
 
 export const getServerSideProps = async () => {
   const res = await fetch(process.env.NEXT_PUBLIC_API_URL + "/api/traffic");
@@ -55,4 +59,3 @@ export const getServerSideProps = async () => {
   // Pass data to the page via props
   return { props: { traffic } };
 };
-export default Home;
