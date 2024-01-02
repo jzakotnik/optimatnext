@@ -36,9 +36,11 @@ export default function TrafficCard({ traffic }: TrafficCardProps) {
       }}
     >
       <CardHeader
-        sx={headerSX}
-        titleTypographyProps={{ variant: "subtitle1" }}
-        title={traffic.items + " Min"}
+        title={
+          <Typography variant="h5" sx={{ fontWeight: "bold" }}>
+            {traffic.items + " Min"}
+          </Typography>
+        }
         avatar={
           <Avatar sx={{ bgcolor: "#AAFFFF" }} aria-label="icon">
             <DirectionsCarFilledIcon />
@@ -46,7 +48,9 @@ export default function TrafficCard({ traffic }: TrafficCardProps) {
         }
       />
       <CardContent>
-        <Typography variant="caption">Verkehr KfW</Typography>
+        <Typography variant="h5" sx={{ fontWeight: "bold" }}>
+          Verkehr KfW
+        </Typography>
       </CardContent>
     </Card>
   );

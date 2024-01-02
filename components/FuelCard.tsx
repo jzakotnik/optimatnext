@@ -14,7 +14,7 @@ type FuelCardProps = {
 
 const headerSX = {
   p: 2.5,
-  "& .MuiCardHeader-action": { m: "0px auto", alignSelf: "center" },
+  fontWeight: "bold",
 };
 
 export default function FuelCard({ fuel }: FuelCardProps) {
@@ -36,8 +36,7 @@ export default function FuelCard({ fuel }: FuelCardProps) {
       }}
     >
       <CardHeader
-        sx={headerSX}
-        titleTypographyProps={{ variant: "subtitle1" }}
+        titleTypographyProps={{ variant: "h5", fontWeight: "bold" }}
         title={fuel.fuelprice + " EUR"}
         avatar={
           <Avatar sx={{ bgcolor: "#0AFAFF" }} aria-label="icon">
@@ -46,7 +45,9 @@ export default function FuelCard({ fuel }: FuelCardProps) {
         }
       />
       <CardContent>
-        <Typography variant="caption">Benzinpreis Königstein</Typography>
+        <Typography variant="h5" sx={{ fontWeight: "bold" }}>
+          Benzinpreis Königstein
+        </Typography>
       </CardContent>
     </Card>
   );

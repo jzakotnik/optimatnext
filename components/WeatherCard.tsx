@@ -36,9 +36,11 @@ export default function WeatherCard({ weather }: WeatherCardProps) {
       }}
     >
       <CardHeader
-        sx={headerSX}
-        titleTypographyProps={{ variant: "subtitle1" }}
-        title={parseInt(weather.items) + " °C"}
+        title={
+          <Typography variant="h5" sx={{ fontWeight: "bold" }}>
+            {parseInt(weather.items) + " °C"}
+          </Typography>
+        }
         avatar={
           <Avatar sx={{ bgcolor: "#FFAAAA" }} aria-label="icon">
             <ThermostatIcon />
@@ -46,7 +48,9 @@ export default function WeatherCard({ weather }: WeatherCardProps) {
         }
       />
       <CardContent>
-        <Typography variant="caption">Temperatur</Typography>
+        <Typography variant="h5" sx={{ fontWeight: "bold" }}>
+          Temperatur
+        </Typography>
       </CardContent>
     </Card>
   );

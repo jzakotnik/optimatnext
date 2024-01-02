@@ -64,9 +64,11 @@ export default function TibberCard({ tibber }: TibberCardProps) {
       }}
     >
       <CardHeader
-        sx={headerSX}
-        titleTypographyProps={{ variant: "subtitle1" }}
-        title={currentPrice + " ct"}
+        title={
+          <Typography variant="h5" sx={{ fontWeight: "bold" }}>
+            {currentPrice + " ct"}
+          </Typography>
+        }
         avatar={
           <Avatar sx={{ bgcolor: "#FFA444" }} aria-label="icon">
             <ElectricBoltIcon />
@@ -74,10 +76,10 @@ export default function TibberCard({ tibber }: TibberCardProps) {
         }
       />
       <CardContent>
-        <Typography>
+        <Typography variant="h5" sx={{ fontWeight: "bold" }}>
           {todayLow} - {todayHigh} ct heute
         </Typography>
-        <Typography>
+        <Typography variant="h5" sx={{ fontWeight: "bold" }}>
           {tomorrowLow} - {tomorrowHigh} ct morgen
         </Typography>
       </CardContent>

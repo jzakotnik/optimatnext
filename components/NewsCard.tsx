@@ -37,9 +37,12 @@ export default function NewsCard({ news }: NewsCardProps) {
       }}
     >
       <CardHeader
-        sx={headerSX}
-        titleTypographyProps={{ variant: "subtitle1" }}
-        title={<Typography variant="caption">Spiegel Online News</Typography>}
+        titleTypographyProps={{ variant: "h5", fontWeight: "bold" }}
+        title={
+          <Typography variant="h5" sx={{ fontWeight: "bold" }}>
+            Spiegel Online News
+          </Typography>
+        }
         avatar={
           <Avatar sx={{ bgcolor: "#FFAAFF" }} aria-label="icon">
             <FeedIcon />
@@ -48,7 +51,9 @@ export default function NewsCard({ news }: NewsCardProps) {
       />
       <CardContent>
         {news.items.slice(0, 5).map((n: any, i: number) => (
-          <Typography key={i}>{n}</Typography>
+          <Typography variant="h5" sx={{ fontWeight: "bold" }} key={i}>
+            {n}
+          </Typography>
         ))}
       </CardContent>
     </Card>

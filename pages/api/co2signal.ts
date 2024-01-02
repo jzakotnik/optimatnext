@@ -27,7 +27,12 @@ export default async function handler(
     await writeKey("co2signal", response as any);
     res
       .status(200)
-      .json({ key: "CO2", items: response.data.fossilFuelPercentage });
+      .json({
+        key: "CO2",
+        items: response.data.fossilFuelPercentage
+          ? response.data.fossilFuelPercentage
+          : 0,
+      });
   } else {
     console.log("Used cache");
     res.status(200).json({

@@ -13,8 +13,8 @@ type CO2SignalCardProps = {
 };
 
 const headerSX = {
+  fontWeight: "bold",
   p: 2.5,
-  "& .MuiCardHeader-action": { m: "0px auto", alignSelf: "center" },
 };
 
 export default function CO2SignalCard({ co2 }: CO2SignalCardProps) {
@@ -37,8 +37,12 @@ export default function CO2SignalCard({ co2 }: CO2SignalCardProps) {
     >
       <CardHeader
         sx={headerSX}
-        titleTypographyProps={{ variant: "subtitle1" }}
-        title={co2.items.data.fossilFuelPercentage + " %"}
+        titleTypographyProps={{ variant: "h5", fontWeight: "bold" }}
+        title={
+          co2.items.data.fossilFuelPercentage
+            ? co2.items.data.fossilFuelPercentage
+            : "" + " %"
+        }
         avatar={
           <Avatar sx={{ bgcolor: "#FFFFAA" }} aria-label="icon">
             <EnergySavingsLeafIcon />
@@ -46,7 +50,9 @@ export default function CO2SignalCard({ co2 }: CO2SignalCardProps) {
         }
       />
       <CardContent>
-        <Typography variant="caption">CO2 im Strommix</Typography>
+        <Typography variant="h5" sx={{ fontWeight: "bold" }}>
+          CO2 im Strommix
+        </Typography>
       </CardContent>
     </Card>
   );

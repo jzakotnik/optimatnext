@@ -51,9 +51,11 @@ export default function PhoneCard({ phone }: PhoneCardProps) {
       }}
     >
       <CardHeader
-        sx={headerSX}
-        titleTypographyProps={{ variant: "subtitle1" }}
-        title={<Typography variant="caption">Telefon</Typography>}
+        title={
+          <Typography variant="h5" sx={{ fontWeight: "bold" }}>
+            Telefon
+          </Typography>
+        }
         avatar={
           <Avatar sx={{ bgcolor: "#AFFAAC" }} aria-label="icon">
             <ContactPhoneIcon />
@@ -62,7 +64,9 @@ export default function PhoneCard({ phone }: PhoneCardProps) {
       />
       <CardContent>
         {formattedCalls.slice(0, 5).map((n: any, i: number) => (
-          <Typography key={i}>{n}</Typography>
+          <Typography variant="h5" sx={{ fontWeight: "bold" }} key={i}>
+            {n}
+          </Typography>
         ))}
       </CardContent>
     </Card>
