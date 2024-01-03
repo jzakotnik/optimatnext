@@ -71,14 +71,14 @@ export default function Home({
         container
         direction="column"
         justifyContent="space-around"
-        alignItems="center"
+        alignItems="stretch"
       >
         <Grid
           container
           item
           direction="row"
           justifyContent="space-around"
-          alignItems="center"
+          alignItems="stretch"
         >
           <Grid item sx={{ m: 1 }}>
             <TrafficCard traffic={data ? updatedTraffic : traffic} />

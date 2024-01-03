@@ -22,12 +22,13 @@ export default async function handler(
     console.log("Refreshing Cache for Fuel");
     const fuelprice = await fetch(requestURL);
     if (!fuelprice.ok) {
+      console.log("Fuel Request failed", fuelprice);
       res.status(200).json({
         key: "fuel",
         items: {},
       });
     }
-    console.log("Fuel data", fuelprice);
+    //console.log("Fuel data", fuelprice);
     const alldata = await fuelprice.json();
     const data = alldata.prices[location]["e10"];
 

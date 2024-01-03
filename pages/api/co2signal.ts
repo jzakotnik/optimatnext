@@ -25,6 +25,7 @@ export default async function handler(
       },
     });
     if (!co2signal.ok) {
+      console.log("CO2 Request failed", co2signal);
       res.status(200).json({
         key: "co2signal",
         items: {},
