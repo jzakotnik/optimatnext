@@ -22,7 +22,7 @@ const headerSX = {
 export default function PhoneCard({ phone }: PhoneCardProps) {
   function formatPhone(item: any) {
     const date = convertDateString(item.date) as string;
-    console.log("Date", date);
+    //console.log("Date", date);
     const row =
       date +
       ", " +

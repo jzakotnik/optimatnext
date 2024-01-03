@@ -12,9 +12,10 @@ export default async function handler(
   res: NextApiResponse
 ) {
   const cachedData = await readKey("news");
-  console.log("Cached Data last Update", cachedData.age);
+  //console.log("Cached Data last Update", cachedData.age);
   const cacheSeconds = cachedData.age;
   if (isNaN(cacheSeconds) || cacheSeconds > parseInt(NEWS_CACHE_SECONDS)) {
+    console.log("Refreshing Cache for News");
     const feed = await parser.parseURL(url);
     //console.log(feed.title);
     const titles: string[] = [];
@@ -27,7 +28,7 @@ export default async function handler(
 
     res.status(200).json({ key: "news", items: titles });
   } else {
-    console.log("Used cache");
+    //console.log("Used cache for news");
     res.status(200).json({
       key: "news",
       items: JSON.parse(cachedData.data.payload),

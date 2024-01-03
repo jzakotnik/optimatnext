@@ -19,11 +19,11 @@ export default async function handler(
 ) {
   //check if cache hit is sufficient
   const cachedData = await readKey("fritz");
-  console.log("Cached Data last Update", cachedData.age);
+  //console.log("Cached Data last Update", cachedData.age);
   const cacheSeconds = cachedData.age;
 
   if (isNaN(cacheSeconds) || cacheSeconds > parseInt(FRITZ_CACHE_SECONDS)) {
-    console.log("Cache too old, refreshing");
+    console.log("Refreshing Cache for Fritz");
     const fritz = require("fritzbox.js");
     const calls = await fritz.getCalls(options);
     if (calls.error) return console.log("Error: " + calls.error.message);
@@ -35,7 +35,7 @@ export default async function handler(
     res.status(200).json({ key: "fritz", items: missedCalls.slice(0, 10) });
   } //this is a cache hit
   else {
-    console.log("Used cache");
+    //console.log("Used cache for phone data");
     res.status(200).json({
       key: "fritz",
       items: JSON.parse(cachedData.data.payload).slice(0, 10),

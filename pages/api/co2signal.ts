@@ -13,28 +13,31 @@ export default async function handler(
   res: NextApiResponse
 ) {
   const cachedData = await readKey("co2signal");
-  console.log("Cached Data last Update", cachedData.age);
+  //console.log("Cached Data last Update", cachedData.age);
   const cacheSeconds = cachedData.age;
 
   if (isNaN(cacheSeconds) || cacheSeconds > parseInt(CO2SIGNAL_CACHE_SECONDS)) {
+    console.log("Refreshing Cache for Co2");
     const co2signal = await fetch(CO2SIGNAL_URL, {
       headers: {
         "auth-token": CO2SIGNAL_APIKEY,
         "Content-Type": "application/json",
       },
     });
+    if (!co2signal.ok) {
+      res.status(200).json({
+        key: "co2signal",
+        items: {},
+      });
+    }
     const response = await co2signal.json();
     await writeKey("co2signal", response as any);
-    res
-      .status(200)
-      .json({
-        key: "CO2",
-        items: response.data.fossilFuelPercentage
-          ? response.data.fossilFuelPercentage
-          : 0,
-      });
+    res.status(200).json({
+      key: "CO2",
+      items: response,
+    });
   } else {
-    console.log("Used cache");
+    //console.log("Used cache for CO2 Signal");
     res.status(200).json({
       key: "co2signal",
       items: JSON.parse(cachedData.data.payload),

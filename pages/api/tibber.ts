@@ -49,10 +49,11 @@ export default async function handler(
   res: NextApiResponse
 ) {
   const cachedData = await readKey("tibber");
-  console.log("Cached Data last Update", cachedData.age);
+  //console.log("Cached Data last Update", cachedData.age);
   const cacheSeconds = cachedData.age;
 
   if (isNaN(cacheSeconds) || cacheSeconds > parseInt(TIBBER_CACHE_SECONDS)) {
+    console.log("Refreshing Cache for Tibber");
     const data = await fetch(location, {
       method: "POST",
       body: JSON.stringify(query),
@@ -65,7 +66,7 @@ export default async function handler(
     await writeKey("tibber", data as any);
     res.status(200).json({ key: "tibber", price: data });
   } else {
-    console.log("Used cache");
+    //console.log("Used cache for tibber");
     res.status(200).json({
       key: "tibber",
       items: JSON.parse(cachedData.data.payload),

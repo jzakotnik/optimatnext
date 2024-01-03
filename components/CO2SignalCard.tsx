@@ -20,6 +20,9 @@ const headerSX = {
 export default function CO2SignalCard({ co2 }: CO2SignalCardProps) {
   const theme = useTheme();
   console.log("Rendering co2", co2);
+  let percentage = 0;
+  if ("data" in co2.items)
+    percentage = parseInt(co2.items.data.fossilFuelPercentage);
   return (
     <Card
       elevation={1}
@@ -38,11 +41,7 @@ export default function CO2SignalCard({ co2 }: CO2SignalCardProps) {
       <CardHeader
         sx={headerSX}
         titleTypographyProps={{ variant: "h5", fontWeight: "bold" }}
-        title={
-          co2.items.data.fossilFuelPercentage
-            ? co2.items.data.fossilFuelPercentage
-            : "" + " %"
-        }
+        title={percentage + " %"}
         avatar={
           <Avatar sx={{ bgcolor: "#FFFFAA" }} aria-label="icon">
             <EnergySavingsLeafIcon />

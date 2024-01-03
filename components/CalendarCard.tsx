@@ -20,10 +20,14 @@ const headerSX = {
 
 export default function CalendarCard({ calendar }: CalendarCardProps) {
   function formatCalendar(item: any) {
-    const date = convertDateString(item.startTime.dateTime) as string;
-    console.log("Date", date);
-    const row = date + ", " + item.summary;
-    return row;
+    try {
+      const date = convertDateString(item.startTime.dateTime) as string;
+      //console.log("Date", date);
+      const row = date + ", " + item.summary;
+      return row;
+    } catch (e: any) {
+      return "Kein Eintrag";
+    }
   }
 
   const theme = useTheme();
@@ -41,10 +45,8 @@ export default function CalendarCard({ calendar }: CalendarCardProps) {
       }}
     >
       <CardHeader
-        sx={headerSX}
-        titleTypographyProps={{ variant: "subtitle1" }}
         title={
-          <Typography variant="caption" sx={{ fontWeight: "bold" }}>
+          <Typography variant="h5" sx={{ fontWeight: "bold" }}>
             Kalender
           </Typography>
         }

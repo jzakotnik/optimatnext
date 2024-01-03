@@ -19,35 +19,45 @@ const headerSX = {
 
 export default function TibberCard({ tibber }: TibberCardProps) {
   const theme = useTheme();
+  let currentPrice = 0;
+  let todayLow = 0;
+  let todayHigh = 0;
+  let tomorrowHigh = 0;
+  let tomorrowLow = 0;
 
-  const currentPrice = Math.floor(
-    parseFloat(
-      tibber.items.data.viewer.homes[0].currentSubscription.priceInfo.current
-        .total
-    ) * 100
-  );
-  const todayPrices =
-    tibber.items.data.viewer.homes[0].currentSubscription.priceInfo.today.map(
-      (x: any) => Math.floor(parseFloat(x.total) * 100)
+  try {
+    currentPrice = Math.floor(
+      parseFloat(
+        tibber.items.data.viewer.homes[0].currentSubscription.priceInfo.current
+          .total
+      ) * 100
     );
+    const todayPrices =
+      tibber.items.data.viewer.homes[0].currentSubscription.priceInfo.today.map(
+        (x: any) => Math.floor(parseFloat(x.total) * 100)
+      );
 
-  const tomorrowPrices =
-    tibber.items.data.viewer.homes[0].currentSubscription.priceInfo.tomorrow.map(
-      (x: any) => Math.floor(parseFloat(x.total) * 100)
+    const tomorrowPrices =
+      tibber.items.data.viewer.homes[0].currentSubscription.priceInfo.tomorrow.map(
+        (x: any) => Math.floor(parseFloat(x.total) * 100)
+      );
+
+    todayLow = Math.min(...todayPrices);
+    todayHigh = Math.max(...todayPrices);
+    tomorrowLow = tomorrowPrices.length > 0 ? Math.min(...tomorrowPrices) : 0;
+    tomorrowHigh = tomorrowPrices.length > 0 ? Math.max(...tomorrowPrices) : 0;
+    console.log(
+      "Rendering tibber",
+      tibber,
+      currentPrice,
+      todayPrices,
+      todayLow,
+      todayHigh
     );
+  } catch (e: any) {
+    console.log("Something went wrong in catching tibber price", e.toString());
+  }
 
-  const todayLow = Math.min(...todayPrices);
-  const todayHigh = Math.max(...todayPrices);
-  const tomorrowLow = Math.min(...tomorrowPrices);
-  const tomorrowHigh = Math.max(...tomorrowPrices);
-  console.log(
-    "Rendering tibber",
-    tibber,
-    currentPrice,
-    todayPrices,
-    todayLow,
-    todayHigh
-  );
   return (
     <Card
       elevation={1}

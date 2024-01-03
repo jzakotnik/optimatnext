@@ -14,10 +14,11 @@ export default async function handler(
   res: NextApiResponse
 ) {
   const cachedData = await readKey("traffic");
-  console.log("Cached Data last Update", cachedData.age);
+  //console.log("Cached Data last Update", cachedData.age);
   const cacheSeconds = cachedData.age;
 
   if (isNaN(cacheSeconds) || cacheSeconds > parseInt(TRAFFIC_CACHE_SECONDS)) {
+    console.log("Refreshing Cache for Traffic");
     const traffic = await fetch(requestURL);
     const data = await traffic.json();
     const convertedDuration = data.rows[0].elements[0].duration_in_traffic
@@ -26,7 +27,7 @@ export default async function handler(
     await writeKey("traffic", durationMinutes as any);
     res.status(200).json({ key: "traffic", items: durationMinutes });
   } else {
-    console.log("Used cache");
+    //console.log("Used cache for traffic");
     res.status(200).json({
       key: "traffic",
       items: JSON.parse(cachedData.data.payload),

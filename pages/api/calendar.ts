@@ -42,16 +42,17 @@ export default async function handler(
   res: NextApiResponse
 ) {
   const cachedData = await readKey("calendar");
-  console.log("Cached Data last Update", cachedData.age);
+  //console.log("Cached Data last Update", cachedData.age);
   const cacheSeconds = cachedData.age;
 
   if (isNaN(cacheSeconds) || cacheSeconds > parseInt(CALENDAR_CACHE_SECONDS)) {
+    console.log("Refreshing Cache for Calendar");
     const events = await listEvents();
 
     await writeKey("calendar", events as any);
     res.status(200).json({ key: "calendar", items: events });
   } else {
-    console.log("Used cache");
+    //console.log("Used cache for Calendar");
     res.status(200).json({
       key: "Kalender",
       items: JSON.parse(cachedData.data.payload),

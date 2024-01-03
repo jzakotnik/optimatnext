@@ -20,6 +20,12 @@ const headerSX = {
 export default function WeatherCard({ weather }: WeatherCardProps) {
   const theme = useTheme();
   console.log("Rendering weather", weather);
+  let temperature = 0;
+  try {
+    temperature = parseInt(weather.items);
+  } catch (e: any) {
+    console.log("Something went wrong with the weather", e.toString());
+  }
   return (
     <Card
       elevation={1}
@@ -38,7 +44,7 @@ export default function WeatherCard({ weather }: WeatherCardProps) {
       <CardHeader
         title={
           <Typography variant="h5" sx={{ fontWeight: "bold" }}>
-            {parseInt(weather.items) + " °C"}
+            {temperature + " °C"}
           </Typography>
         }
         avatar={

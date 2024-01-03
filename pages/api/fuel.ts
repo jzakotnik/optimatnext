@@ -15,21 +15,30 @@ export default async function handler(
 ) {
   //check if cache hit is sufficient
   const cachedData = await readKey("fuel");
-  console.log("Cached Data last Update", cachedData.age);
+  //console.log("Cached Data last Update", cachedData.age);
   const cacheSeconds = cachedData.age;
 
   if (isNaN(cacheSeconds) || cacheSeconds > parseInt(TANKEN_CACHE_SECONDS)) {
+    console.log("Refreshing Cache for Fuel");
     const fuelprice = await fetch(requestURL);
+    if (!fuelprice.ok) {
+      res.status(200).json({
+        key: "fuel",
+        items: {},
+      });
+    }
+    console.log("Fuel data", fuelprice);
     const alldata = await fuelprice.json();
     const data = alldata.prices[location]["e10"];
+
     await writeKey("fuel", data);
 
     res.status(200).json({
       key: "fuel",
-      fuelprice: data,
+      items: data,
     });
   } else {
-    console.log("Used cache");
+    //console.log("Used cache for fuel");
     res.status(200).json({
       key: "fuel",
       items: JSON.parse(cachedData.data.payload),

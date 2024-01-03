@@ -13,10 +13,11 @@ export default async function handler(
   res: NextApiResponse
 ) {
   const cachedData = await readKey("weather");
-  console.log("Cached Data last Update", cachedData.age);
+  //console.log("Cached Data last Update", cachedData.age);
   const cacheSeconds = cachedData.age;
 
   if (isNaN(cacheSeconds) || cacheSeconds > parseInt(WEATHER_CACHE_SECONDS)) {
+    console.log("Refreshing Cache for Weather");
     const weather = await fetch(requestURL);
     const data = await weather.json();
     const singleData = data.main.temp;
@@ -24,7 +25,7 @@ export default async function handler(
 
     res.status(200).json({ key: "weather", items: singleData });
   } else {
-    console.log("Used cache");
+    //console.log("Used cache for weather");
     res.status(200).json({
       key: "weather",
       items: JSON.parse(cachedData.data.payload),

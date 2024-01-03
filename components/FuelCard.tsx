@@ -37,7 +37,7 @@ export default function FuelCard({ fuel }: FuelCardProps) {
     >
       <CardHeader
         titleTypographyProps={{ variant: "h5", fontWeight: "bold" }}
-        title={fuel.fuelprice + " EUR"}
+        title={"items" in fuel ? fuel.items + " EUR" : "-"}
         avatar={
           <Avatar sx={{ bgcolor: "#0AFAFF" }} aria-label="icon">
             <LocalGasStationIcon />

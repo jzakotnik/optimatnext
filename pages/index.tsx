@@ -1,5 +1,6 @@
 import type { NextPage } from "next";
 import Head from "next/head";
+import { useRouter } from "next/router";
 
 import { ThemeProvider, createTheme } from "@mui/material/styles";
 import CssBaseline from "@mui/material/CssBaseline";
@@ -12,6 +13,8 @@ import CalendarCard from "@/components/CalendarCard";
 import FuelCard from "@/components/FuelCard";
 import WeatherCard from "@/components/WeatherCard";
 import TibberCard from "@/components/TibberCard";
+import useSWR from "swr";
+import fetcher from "@/utils/fetcher";
 
 const darkTheme = createTheme({
   palette: {
@@ -40,6 +43,27 @@ export default function Home({
   weather,
   tibber,
 }: IndexPageProps) {
+  const api = process.env.NEXT_PUBLIC_API_URL;
+  const { data, error, isLoading } = useSWR("allAPIs", fetcher, {
+    refreshInterval: parseInt(process.env.NEXT_PUBLIC_REFRESH_INTERVAL!),
+  });
+  console.log(
+    "SWR Data",
+    api,
+    data,
+    error,
+    isLoading,
+    parseInt(process.env.NEXT_PUBLIC_REFRESH_INTERVAL!)
+  );
+  const updatedTraffic = data?.data.traffic;
+  const updatedCo2 = data?.data.co2;
+  const updatedNews = data?.data.news;
+  const updatedPhone = data?.data.phone;
+  const updatedCalendar = data?.data.calendar;
+  const updatedFuel = data?.data.fuel;
+  const updatedWeather = data?.data.weather;
+  const updatedTibber = data?.data.tibber;
+
   return (
     <ThemeProvider theme={darkTheme}>
       <CssBaseline />
@@ -57,27 +81,16 @@ export default function Home({
           alignItems="center"
         >
           <Grid item sx={{ m: 1 }}>
-            <TrafficCard traffic={traffic} />
+            <TrafficCard traffic={data ? updatedTraffic : traffic} />
           </Grid>
           <Grid item sx={{ m: 1 }}>
             <CO2SignalCard co2={co2} />
           </Grid>
           <Grid item sx={{ m: 1 }}>
-            <NewsCard news={news} />
-          </Grid>
-        </Grid>
-        <Grid
-          container
-          item
-          direction="row"
-          justifyContent="space-around"
-          alignItems="center"
-        >
-          <Grid item sx={{ m: 1 }}>
-            <PhoneCard phone={phone} />
+            <WeatherCard weather={weather} />
           </Grid>
           <Grid item sx={{ m: 1 }}>
-            <CalendarCard calendar={calendar} />
+            <TibberCard tibber={tibber} />
           </Grid>
           <Grid item sx={{ m: 1 }}>
             <FuelCard fuel={fuel} />
@@ -90,11 +103,22 @@ export default function Home({
           justifyContent="space-around"
           alignItems="center"
         >
-          <Grid item>
-            <WeatherCard weather={weather} />
+          <Grid item sx={{ m: 1 }}>
+            <NewsCard news={news} />
           </Grid>
-          <Grid item>
-            <TibberCard tibber={tibber} />
+        </Grid>
+        <Grid
+          container
+          item
+          direction="row"
+          justifyContent="space-around"
+          alignItems="center"
+        >
+          <Grid item sx={{ m: 1 }}>
+            <PhoneCard phone={data ? updatedPhone : phone} />
+          </Grid>
+          <Grid item sx={{ m: 1 }}>
+            <CalendarCard calendar={calendar} />
           </Grid>
         </Grid>
       </Grid>
