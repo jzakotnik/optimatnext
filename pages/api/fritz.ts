@@ -25,14 +25,18 @@ export default async function handler(
   if (isNaN(cacheSeconds) || cacheSeconds > parseInt(FRITZ_CACHE_SECONDS)) {
     console.log("Refreshing Cache for Fritz");
     const fritz = require("fritzbox.js");
-    const calls = await fritz.getCalls(options);
-    if (calls.error) return console.log("Error: " + calls.error.message);
-    //console.log("Got " + calls.length + "calls.");
-    //console.log("Calls", calls);
-    const missedCalls = calls.filter((c: any) => c.type === "missed");
-    await writeKey("fritz", missedCalls);
+    try {
+      const calls = await fritz.getCalls(options);
+      if (calls.error) return console.log("Error: " + calls.error.message);
+      //console.log("Got " + calls.length + "calls.");
+      //console.log("Calls", calls);
+      const missedCalls = calls.filter((c: any) => c.type === "missed");
+      await writeKey("fritz", missedCalls);
 
-    res.status(200).json({ key: "fritz", items: missedCalls.slice(0, 10) });
+      res.status(200).json({ key: "fritz", items: missedCalls.slice(0, 10) });
+    } catch (e: any) {
+      res.status(200).json({ key: "fritz", items: {} });
+    }
   } //this is a cache hit
   else {
     //console.log("Used cache for phone data");
