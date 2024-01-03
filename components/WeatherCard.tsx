@@ -30,6 +30,7 @@ export default function WeatherCard({ weather }: WeatherCardProps) {
     <Card
       elevation={1}
       sx={{
+        height: "100%",
         border: "1px solid",
         borderRadius: 2,
         borderColor: "#FFFFFF",

@@ -26,6 +26,7 @@ export default function NewsCard({ news }: NewsCardProps) {
       elevation={1}
       sx={{
         border: "1px solid",
+        height: "100%",
         borderRadius: 2,
         borderColor: "#FFFFF",
         "& pre": {

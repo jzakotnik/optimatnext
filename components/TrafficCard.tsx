@@ -24,8 +24,10 @@ export default function TrafficCard({ traffic }: TrafficCardProps) {
     <Card
       elevation={1}
       sx={{
+        height: "100%",
         border: "1px solid",
         borderRadius: 2,
+
         borderColor: "#FFFFFF",
         "& pre": {
           m: 0,

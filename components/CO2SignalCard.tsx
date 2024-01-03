@@ -30,6 +30,7 @@ export default function CO2SignalCard({ co2 }: CO2SignalCardProps) {
         border: "1px solid",
         borderRadius: 2,
         borderColor: "#FFFFF",
+        height: "100%",
         "& pre": {
           m: 0,
           p: "16px !important",

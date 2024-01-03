@@ -1,5 +1,6 @@
 import {
   Avatar,
+  Box,
   Card,
   CardContent,
   CardHeader,
@@ -42,6 +43,7 @@ export default function CalendarCard({ calendar }: CalendarCardProps) {
         border: "1px solid",
         borderRadius: 2,
         borderColor: "#FFFFF",
+        height: "100%",
       }}
     >
       <CardHeader
