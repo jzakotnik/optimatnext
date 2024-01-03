@@ -28,21 +28,35 @@ export default async function handler(
         items: {},
       });
     }
-    //console.log("Fuel data", fuelprice);
-    const alldata = await fuelprice.json();
-    const data = alldata.prices[location]["e10"];
+    //console.log("Fuel data response:", fuelprice);
+    try {
+      const alldata = await fuelprice.json();
+      const data = alldata.prices[location]["e10"];
 
-    await writeKey("fuel", data);
+      await writeKey("fuel", data);
 
-    res.status(200).json({
-      key: "fuel",
-      items: data,
-    });
+      res.status(200).json({
+        key: "fuel",
+        items: data,
+      });
+    } catch (e: any) {
+      res.status(200).json({
+        key: "fuel",
+        items: "0",
+      });
+    }
   } else {
     //console.log("Used cache for fuel");
-    res.status(200).json({
-      key: "fuel",
-      items: JSON.parse(cachedData.data.payload),
-    });
+    try {
+      res.status(200).json({
+        key: "fuel",
+        items: JSON.parse(cachedData.data.payload),
+      });
+    } catch (e: any) {
+      res.status(200).json({
+        key: "fuel",
+        items: 0,
+      });
+    }
   }
 }

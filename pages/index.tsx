@@ -131,6 +131,7 @@ export const getServerSideProps = async () => {
     process.env.NEXT_PUBLIC_API_URL + "/api/traffic"
   );
   const traffic = await trafficresponse.json();
+
   const co2response = await fetch(
     process.env.NEXT_PUBLIC_API_URL + "/api/co2signal"
   );
