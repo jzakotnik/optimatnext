@@ -84,16 +84,16 @@ export default function Home({
             <TrafficCard traffic={data ? updatedTraffic : traffic} />
           </Grid>
           <Grid item sx={{ m: 1 }}>
-            <CO2SignalCard co2={co2} />
+            <CO2SignalCard co2={data ? updatedCo2 : co2} />
           </Grid>
           <Grid item sx={{ m: 1 }}>
-            <WeatherCard weather={weather} />
+            <WeatherCard weather={data ? updatedWeather : weather} />
           </Grid>
           <Grid item sx={{ m: 1 }}>
-            <TibberCard tibber={tibber} />
+            <TibberCard tibber={data ? updatedTibber : tibber} />
           </Grid>
           <Grid item sx={{ m: 1 }}>
-            <FuelCard fuel={fuel} />
+            <FuelCard fuel={data ? updatedFuel : fuel} />
           </Grid>
         </Grid>
         <Grid
@@ -118,7 +118,7 @@ export default function Home({
             <PhoneCard phone={data ? updatedPhone : phone} />
           </Grid>
           <Grid item sx={{ m: 1 }}>
-            <CalendarCard calendar={calendar} />
+            <CalendarCard calendar={data ? updatedCalendar : calendar} />
           </Grid>
         </Grid>
       </Grid>
