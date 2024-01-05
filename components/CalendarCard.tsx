@@ -34,8 +34,12 @@ export default function CalendarCard({ calendar }: CalendarCardProps) {
   const theme = useTheme();
 
   console.log("Rendering calendar", calendar);
-
-  const formattedCalendar = calendar.items.map((i: any) => formatCalendar(i));
+  let formattedCalendar = ["Fehler"];
+  try {
+    formattedCalendar = calendar.items.map((i: any) => formatCalendar(i));
+  } catch (e: any) {
+    console.log("ERROR formatting calendar items");
+  }
   return (
     <Card
       elevation={1}

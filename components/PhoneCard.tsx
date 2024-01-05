@@ -34,7 +34,12 @@ export default function PhoneCard({ phone }: PhoneCardProps) {
 
   const theme = useTheme();
   console.log("Rendering phone", phone);
-  const formattedCalls = phone.items.map((i: any) => formatPhone(i));
+  let formattedCalls = ["Fehler"];
+  try {
+    formattedCalls = phone.items.map((i: any) => formatPhone(i));
+  } catch (e: any) {
+    console.log("ERROR formatting phone calls");
+  }
   return (
     <Card
       elevation={1}

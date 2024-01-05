@@ -23,12 +23,17 @@ async function listEvents() {
     auth: auth,
   });
 
+  const today = new Date();
   const entries = await calendar.events.list({
     calendarId: calendarID,
-    timeMin: new Date().toISOString(),
+    timeMin: today.toISOString(),
+
     maxResults: 10,
     singleEvents: true,
     orderBy: "startTime",
+  });
+  entries.data.items!.map((a) => {
+    console.log("Calendar DEBUG", a.summary, a.start);
   });
 
   const filteredEntries = entries.data.items!.map((a) => {
@@ -44,17 +49,27 @@ export default async function handler(
   const cachedData = await readKey("calendar");
   //console.log("Cached Data last Update", cachedData.age);
   const cacheSeconds = cachedData.age;
+  try {
+    if (
+      isNaN(cacheSeconds) ||
+      cacheSeconds > parseInt(CALENDAR_CACHE_SECONDS)
+    ) {
+      console.log("Refreshing Cache for Calendar");
+      const events = await listEvents();
 
-  if (isNaN(cacheSeconds) || cacheSeconds > parseInt(CALENDAR_CACHE_SECONDS)) {
-    console.log("Refreshing Cache for Calendar");
-    const events = await listEvents();
-
-    await writeKey("calendar", events as any);
-    res.status(200).json({ key: "calendar", items: events });
-  } else {
-    //console.log("Used cache for Calendar");
+      await writeKey("calendar", events as any);
+      res.status(200).json({ key: "calendar", items: events });
+    } else {
+      //console.log("Used cache for Calendar");
+      res.status(200).json({
+        key: "calendar",
+        items: JSON.parse(cachedData.data.payload),
+      });
+    }
+  } catch (e: any) {
+    console.log("ERROR getting calendar data");
     res.status(200).json({
-      key: "Kalender",
+      key: "calendar",
       items: JSON.parse(cachedData.data.payload),
     });
   }
