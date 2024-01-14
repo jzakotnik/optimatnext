@@ -44,9 +44,19 @@ export default function Home({
   tibber,
 }: IndexPageProps) {
   const api = process.env.NEXT_PUBLIC_API_URL;
-  const { data, error, isLoading } = useSWR("allAPIs", fetcher, {
-    refreshInterval: parseInt(process.env.NEXT_PUBLIC_REFRESH_INTERVAL!),
-  });
+  //no caching for SWR, hence random string
+  const { data, error, isLoading } = useSWR(
+    "allAPIs" + Math.floor(Date.now() / 1000).toString(),
+    fetcher,
+    {
+      refreshInterval: parseInt(process.env.NEXT_PUBLIC_REFRESH_INTERVAL!),
+      refreshWhenHidden: true,
+    }
+  );
+  const router = useRouter();
+  const handleRefresh = () => {
+    router.reload();
+  };
   console.log(
     "SWR Data",
     api,
@@ -104,7 +114,7 @@ export default function Home({
           alignItems="center"
         >
           <Grid item sx={{ m: 1 }}>
-            <NewsCard news={news} />
+            <NewsCard news={data ? updatedNews : news} />
           </Grid>
         </Grid>
         <Grid

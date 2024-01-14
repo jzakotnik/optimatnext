@@ -20,7 +20,7 @@ const headerSX = {
 
 export default function NewsCard({ news }: NewsCardProps) {
   const theme = useTheme();
-  console.log("Rendering news", news);
+  console.log("Rendering news", new Date().toLocaleString(), news);
   return (
     <Card
       elevation={1}

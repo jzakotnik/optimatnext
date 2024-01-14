@@ -48,6 +48,7 @@ export default function TibberCard({ tibber }: TibberCardProps) {
     tomorrowHigh = tomorrowPrices.length > 0 ? Math.max(...tomorrowPrices) : 0;
     console.log(
       "Rendering tibber",
+      new Date().toLocaleString(),
       tibber,
       currentPrice,
       todayPrices,

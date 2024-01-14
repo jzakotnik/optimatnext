@@ -33,7 +33,7 @@ export default function CalendarCard({ calendar }: CalendarCardProps) {
 
   const theme = useTheme();
 
-  console.log("Rendering calendar", calendar);
+  console.log("Rendering calendar", new Date().toLocaleString(), calendar);
   let formattedCalendar = ["Fehler"];
   try {
     formattedCalendar = calendar.items.map((i: any) => formatCalendar(i));

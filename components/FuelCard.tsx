@@ -19,7 +19,7 @@ const headerSX = {
 
 export default function FuelCard({ fuel }: FuelCardProps) {
   const theme = useTheme();
-  console.log("Rendering fuel", fuel);
+  console.log("Rendering fuel", new Date().toLocaleString(), fuel);
   return (
     <Card
       elevation={1}

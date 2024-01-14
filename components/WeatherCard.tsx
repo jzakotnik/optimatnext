@@ -19,7 +19,7 @@ const headerSX = {
 
 export default function WeatherCard({ weather }: WeatherCardProps) {
   const theme = useTheme();
-  console.log("Rendering weather", weather);
+  console.log("Rendering weather", new Date().toLocaleString(), weather);
   let temperature = 0;
   try {
     temperature = parseInt(weather.items);

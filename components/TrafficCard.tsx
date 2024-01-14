@@ -19,7 +19,7 @@ const headerSX = {
 
 export default function TrafficCard({ traffic }: TrafficCardProps) {
   const theme = useTheme();
-  console.log("Rendering traffic", traffic);
+  console.log("Rendering traffic", new Date().toLocaleString(), traffic);
   return (
     <Card
       elevation={1}

@@ -19,7 +19,7 @@ const headerSX = {
 
 export default function CO2SignalCard({ co2 }: CO2SignalCardProps) {
   const theme = useTheme();
-  console.log("Rendering co2", co2);
+  console.log("Rendering co2", new Date().toLocaleString(), co2);
   let percentage = 0;
   if ("data" in co2.items)
     percentage = parseInt(co2.items.data.fossilFuelPercentage);

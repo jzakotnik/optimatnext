@@ -33,7 +33,7 @@ export default function PhoneCard({ phone }: PhoneCardProps) {
   }
 
   const theme = useTheme();
-  console.log("Rendering phone", phone);
+  console.log("Rendering phone", new Date().toLocaleString(), phone);
   let formattedCalls = ["Fehler"];
   try {
     formattedCalls = phone.items.map((i: any) => formatPhone(i));
