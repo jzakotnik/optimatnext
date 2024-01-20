@@ -38,7 +38,7 @@ export default function PhoneCard({ phone }: PhoneCardProps) {
   try {
     formattedCalls = phone.items.map((i: any) => formatPhone(i));
   } catch (e: any) {
-    console.log("ERROR formatting phone calls");
+    console.log("ERROR formatting phone calls", phone);
   }
   return (
     <Card

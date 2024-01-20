@@ -6,7 +6,8 @@ import { readKey, writeKey } from "../../utils/dbutils";
 const SCOPES = [process.env.GOOGLECALENDAR_URL as string];
 const base64credentials = process.env.GOOGLE_CREDENTIALSBASE64 as string;
 const calendarID = process.env.GOOGLECALENDAR_ID as string;
-const CALENDAR_CACHE_SECONDS = process.env.CALENDAR_CACHE_SECONDS as string;
+const CALENDAR_CACHE_SECONDS = process.env
+  .GOOGLECALENDAR_CACHE_SECONDS as string;
 
 async function listEvents() {
   const googleCredential = JSON.parse(

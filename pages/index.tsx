@@ -44,28 +44,29 @@ export default function Home({
   tibber,
 }: IndexPageProps) {
   const api = process.env.NEXT_PUBLIC_API_URL;
+  const data = null;
   //no caching for SWR, hence random string
-  const { data, error, isLoading } = useSWR(
+  /* const { data, error, isLoading } = useSWR(
     "allAPIs" + Math.floor(Date.now() / 1000).toString(),
     fetcher,
     {
       refreshInterval: parseInt(process.env.NEXT_PUBLIC_REFRESH_INTERVAL!),
       refreshWhenHidden: true,
     }
-  );
+  );*/
   const router = useRouter();
   const handleRefresh = () => {
     router.reload();
   };
-  console.log(
+  /*console.log(
     "SWR Data",
     api,
     data,
     error,
     isLoading,
     parseInt(process.env.NEXT_PUBLIC_REFRESH_INTERVAL!)
-  );
-  const updatedTraffic = data?.data.traffic;
+  );*/
+  /*const updatedTraffic = data?.data.traffic;
   const updatedCo2 = data?.data.co2;
   const updatedNews = data?.data.news;
   const updatedPhone = data?.data.phone;
@@ -73,7 +74,7 @@ export default function Home({
   const updatedFuel = data?.data.fuel;
   const updatedWeather = data?.data.weather;
   const updatedTibber = data?.data.tibber;
-
+*/
   return (
     <ThemeProvider theme={darkTheme}>
       <CssBaseline />
@@ -91,30 +92,19 @@ export default function Home({
           alignItems="stretch"
         >
           <Grid item sx={{ m: 1 }}>
-            <TrafficCard traffic={data ? updatedTraffic : traffic} />
+            <TrafficCard traffic={traffic} />
           </Grid>
           <Grid item sx={{ m: 1 }}>
-            <CO2SignalCard co2={data ? updatedCo2 : co2} />
+            <CO2SignalCard co2={co2} />
           </Grid>
           <Grid item sx={{ m: 1 }}>
-            <WeatherCard weather={data ? updatedWeather : weather} />
+            <WeatherCard weather={weather} />
           </Grid>
           <Grid item sx={{ m: 1 }}>
-            <TibberCard tibber={data ? updatedTibber : tibber} />
+            <TibberCard tibber={tibber} />
           </Grid>
           <Grid item sx={{ m: 1 }}>
-            <FuelCard fuel={data ? updatedFuel : fuel} />
-          </Grid>
-        </Grid>
-        <Grid
-          container
-          item
-          direction="row"
-          justifyContent="space-around"
-          alignItems="center"
-        >
-          <Grid item sx={{ m: 1 }}>
-            <NewsCard news={data ? updatedNews : news} />
+            <FuelCard fuel={fuel} />
           </Grid>
         </Grid>
         <Grid
@@ -125,10 +115,21 @@ export default function Home({
           alignItems="center"
         >
           <Grid item sx={{ m: 1 }}>
-            <PhoneCard phone={data ? updatedPhone : phone} />
+            <NewsCard news={news} />
+          </Grid>
+        </Grid>
+        <Grid
+          container
+          item
+          direction="row"
+          justifyContent="space-around"
+          alignItems="center"
+        >
+          <Grid item sx={{ m: 1 }}>
+            <PhoneCard phone={phone} />
           </Grid>
           <Grid item sx={{ m: 1 }}>
-            <CalendarCard calendar={data ? updatedCalendar : calendar} />
+            <CalendarCard calendar={calendar} />
           </Grid>
         </Grid>
       </Grid>
