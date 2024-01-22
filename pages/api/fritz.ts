@@ -1,5 +1,6 @@
 import type { NextApiRequest, NextApiResponse } from "next";
 import { writeKey, readKey } from "../../utils/dbutils";
+const fritz = require("fritzbox.js");
 
 const FRITZ_USER = process.env.FRITZ_USER as string;
 const FRITZ_URL = process.env.FRITZ_URL as string;
@@ -24,7 +25,7 @@ export default async function handler(
 
   if (isNaN(cacheSeconds) || cacheSeconds > parseInt(FRITZ_CACHE_SECONDS)) {
     console.log("Refreshing Cache for Fritz");
-    const fritz = require("fritzbox.js");
+
     try {
       const calls = await fritz.getCalls(options);
       if (calls.error) return console.log("Error: " + calls.error.message);

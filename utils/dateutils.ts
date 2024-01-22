@@ -11,3 +11,13 @@ export function convertDateString(date: string) {
   const d = dayjs(date).format("DD.MM. HH:mm");
   return d;
 }
+export function convertDateDaytoString(date: string) {
+  const d = dayjs(date).format("YYYY-MM-DD");
+  return d;
+}
+convertDateDaytoString;
+
+export function nowDate() {
+  const d = dayjs();
+  return d.toISOString();
+}

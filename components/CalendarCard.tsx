@@ -9,7 +9,7 @@ import {
   useTheme,
 } from "@mui/material";
 import CalendarMonthIcon from "@mui/icons-material/CalendarMonth";
-import { convertDateString } from "@/utils/dateutils";
+import { convertDateDaytoString, convertDateString } from "@/utils/dateutils";
 
 type CalendarCardProps = {
   calendar: any;
@@ -22,7 +22,14 @@ const headerSX = {
 export default function CalendarCard({ calendar }: CalendarCardProps) {
   function formatCalendar(item: any) {
     try {
-      const date = convertDateString(item.startTime.dateTime) as string;
+      //full days have a "date" field, days with time have "dateTime"
+      let date = "No time";
+      if ("dateTime" in item.startTime)
+        date = convertDateString(item.startTime.dateTime) as string;
+
+      if ("date" in item.startTime)
+        date = convertDateDaytoString(item.startTime.date) as string;
+
       //console.log("Date", date);
       const row = date + ", " + item.summary;
       return row;
@@ -34,6 +41,9 @@ export default function CalendarCard({ calendar }: CalendarCardProps) {
   const theme = useTheme();
 
   console.log("Rendering calendar", new Date().toLocaleString(), calendar);
+  calendar.items.map((c: any) => {
+    console.log("Start Time", c.startTime);
+  });
   let formattedCalendar = ["Fehler"];
   try {
     formattedCalendar = calendar.items.map((i: any) => formatCalendar(i));

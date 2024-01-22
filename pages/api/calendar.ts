@@ -2,6 +2,7 @@ import type { NextApiRequest, NextApiResponse } from "next";
 
 import { google } from "googleapis";
 import { readKey, writeKey } from "../../utils/dbutils";
+import { nowDate } from "@/utils/dateutils";
 
 const SCOPES = [process.env.GOOGLECALENDAR_URL as string];
 const base64credentials = process.env.GOOGLE_CREDENTIALSBASE64 as string;
@@ -27,8 +28,7 @@ async function listEvents() {
   const today = new Date();
   const entries = await calendar.events.list({
     calendarId: calendarID,
-    timeMin: today.toISOString(),
-
+    timeMin: nowDate(),
     maxResults: 10,
     singleEvents: true,
     orderBy: "startTime",
