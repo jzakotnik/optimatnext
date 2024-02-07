@@ -47,7 +47,7 @@ export default function FuelCard({ fuel }: FuelCardProps) {
       />
       <CardContent>
         <Typography variant="h5" sx={{ fontWeight: "bold" }}>
-          Benzinpreis Königstein
+          E10 Königstein
         </Typography>
       </CardContent>
     </Card>

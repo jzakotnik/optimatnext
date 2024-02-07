@@ -15,6 +15,7 @@ import WeatherCard from "@/components/WeatherCard";
 import TibberCard from "@/components/TibberCard";
 import useSWR from "swr";
 import fetcher from "@/utils/fetcher";
+import EnergyCard from "@/components/EnergyCard";
 
 const darkTheme = createTheme({
   palette: {
@@ -31,6 +32,7 @@ type IndexPageProps = {
   fuel: any;
   weather: any;
   tibber: any;
+  energy: any;
 };
 
 export default function Home({
@@ -42,9 +44,11 @@ export default function Home({
   fuel,
   weather,
   tibber,
+  energy,
 }: IndexPageProps) {
   const api = process.env.NEXT_PUBLIC_API_URL;
   const data = null;
+  console.log("Energy Index", energy);
   //no caching for SWR, hence random string
   /* const { data, error, isLoading } = useSWR(
     "allAPIs" + Math.floor(Date.now() / 1000).toString(),
@@ -96,6 +100,9 @@ export default function Home({
           </Grid>
           <Grid item sx={{ m: 1 }}>
             <CO2SignalCard co2={co2} />
+          </Grid>
+          <Grid item sx={{ m: 1 }}>
+            <EnergyCard energy={energy} />
           </Grid>
           <Grid item sx={{ m: 1 }}>
             <WeatherCard weather={weather} />
@@ -179,8 +186,24 @@ export const getServerSideProps = async () => {
   );
   const tibber = await tibberresponse.json();
 
+  const energyresponse = await fetch(
+    process.env.NEXT_PUBLIC_API_URL + "/api/alphaess"
+  );
+  const energy = await energyresponse.json();
+  //console.log("Energy api", energy);
+
   // Pass data to the page via props
   return {
-    props: { traffic, co2, news, phone, calendar, fuel, weather, tibber },
+    props: {
+      traffic,
+      co2,
+      news,
+      phone,
+      calendar,
+      fuel,
+      weather,
+      tibber,
+      energy,
+    },
   };
 };
