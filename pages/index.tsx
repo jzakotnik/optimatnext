@@ -190,7 +190,7 @@ export const getServerSideProps = async () => {
     process.env.NEXT_PUBLIC_API_URL + "/api/alphaess"
   );
   const energy = await energyresponse.json();
-  //console.log("Energy api", energy);
+  console.log("Energy api", energy);
 
   // Pass data to the page via props
   return {

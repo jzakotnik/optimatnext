@@ -50,7 +50,7 @@ export default async function handler(
     //console.log("Used cache for alphaess");
     res.status(200).json({
       key: "alphaess",
-      items: JSON.parse(cachedData.data.payload),
+      energy: JSON.parse(cachedData.data.payload),
     });
   }
 }
