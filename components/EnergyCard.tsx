@@ -72,7 +72,7 @@ export default function EnergyCard({ energy }: EnergyCardProps) {
           {"Grid: " + energy.energy.data.pgrid.toString() + " W"}{" "}
         </Typography>
         <Typography variant="h5" sx={{ fontWeight: "bold" }}>
-          {"SoC: " + energy.energy.data.soc.toString()}
+          {"Akku: " + energy.energy.data.soc.toString() + " %"}
         </Typography>
       </CardContent>
     </Card>
