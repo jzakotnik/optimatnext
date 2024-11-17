@@ -61,7 +61,9 @@ export default function EnergyCard({ energy }: EnergyCardProps) {
         }
         avatar={
           <Avatar
-            sx={{ bgcolor: getColor(energy.energy.data.ppv, 200, 2000) }}
+            sx={{
+              bgcolor: getColor(energy.energy.data.pgrid, 80, 300, false),
+            }}
             aria-label="icon"
           >
             <SolarPowerIcon />
