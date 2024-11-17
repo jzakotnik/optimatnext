@@ -121,7 +121,7 @@ export default function Home({
           justifyContent="space-around"
           alignItems="center"
         >
-          <Grid item sx={{ m: 1 }}>
+          <Grid item sx={{ m: 1, width: "100%" }}>
             <NewsCard news={news} />
           </Grid>
         </Grid>

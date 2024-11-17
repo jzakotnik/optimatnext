@@ -17,7 +17,7 @@
     "fritzbox.js": "^2.0.1",
     "googleapis": "^129.0.0",
     "lowdb": "^7.0.1",
-    "next": "14.0.4",
+    "next": "^14.2.18",
     "react": "^18",
     "react-dom": "^18",
     "rss-parser": "^3.13.0",
