@@ -11,6 +11,7 @@ import DirectionsCarFilledIcon from "@mui/icons-material/DirectionsCarFilled";
 import SolarPowerIcon from "@mui/icons-material/SolarPower";
 import ArrowCircleDownIcon from "@mui/icons-material/ArrowCircleDown";
 import ArrowCircleUpIcon from "@mui/icons-material/ArrowCircleUp";
+import getColor from "@/utils/getColor";
 
 type EnergyCardProps = {
   energy: any;
@@ -59,7 +60,10 @@ export default function EnergyCard({ energy }: EnergyCardProps) {
           </Grid>
         }
         avatar={
-          <Avatar sx={{ bgcolor: "#FAEAFF" }} aria-label="icon">
+          <Avatar
+            sx={{ bgcolor: getColor(energy.energy.data.ppv, 200, 2000) }}
+            aria-label="icon"
+          >
             <SolarPowerIcon />
           </Avatar>
         }

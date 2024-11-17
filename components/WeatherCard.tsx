@@ -7,6 +7,7 @@ import {
   useTheme,
 } from "@mui/material";
 import ThermostatIcon from "@mui/icons-material/Thermostat";
+import getColor from "@/utils/getColor";
 
 type WeatherCardProps = {
   weather: any;
@@ -49,7 +50,10 @@ export default function WeatherCard({ weather }: WeatherCardProps) {
           </Typography>
         }
         avatar={
-          <Avatar sx={{ bgcolor: "#FFAAAA" }} aria-label="icon">
+          <Avatar
+            sx={{ bgcolor: getColor(temperature, 10, 20) }}
+            aria-label="icon"
+          >
             <ThermostatIcon />
           </Avatar>
         }

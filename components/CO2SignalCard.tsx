@@ -7,6 +7,7 @@ import {
   useTheme,
 } from "@mui/material";
 import EnergySavingsLeafIcon from "@mui/icons-material/EnergySavingsLeaf";
+import getColor from "@/utils/getColor";
 
 type CO2SignalCardProps = {
   co2: any;
@@ -44,7 +45,10 @@ export default function CO2SignalCard({ co2 }: CO2SignalCardProps) {
         titleTypographyProps={{ variant: "h5", fontWeight: "bold" }}
         title={percentage + " %"}
         avatar={
-          <Avatar sx={{ bgcolor: "#FFFFAA" }} aria-label="icon">
+          <Avatar
+            sx={{ bgcolor: getColor(percentage, 30, 60) }}
+            aria-label="icon"
+          >
             <EnergySavingsLeafIcon />
           </Avatar>
         }

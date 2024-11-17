@@ -7,6 +7,7 @@ import {
   useTheme,
 } from "@mui/material";
 import ElectricBoltIcon from "@mui/icons-material/ElectricBolt";
+import getColor from "@/utils/getColor";
 
 type TibberCardProps = {
   tibber: any;
@@ -82,7 +83,16 @@ export default function TibberCard({ tibber }: TibberCardProps) {
           </Typography>
         }
         avatar={
-          <Avatar sx={{ bgcolor: "#FFA444" }} aria-label="icon">
+          <Avatar
+            sx={{
+              bgcolor: getColor(
+                currentPrice,
+                (todayHigh + todayLow) / 3,
+                (todayHigh + todayLow) / 1.5
+              ),
+            }}
+            aria-label="icon"
+          >
             <ElectricBoltIcon />
           </Avatar>
         }
