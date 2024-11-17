@@ -16,6 +16,7 @@ import TibberCard from "@/components/TibberCard";
 import useSWR from "swr";
 import fetcher from "@/utils/fetcher";
 import EnergyCard from "@/components/EnergyCard";
+import { useState } from "react";
 
 const darkTheme = createTheme({
   palette: {
@@ -79,6 +80,7 @@ export default function Home({
   const updatedWeather = data?.data.weather;
   const updatedTibber = data?.data.tibber;
 */
+
   return (
     <ThemeProvider theme={darkTheme}>
       <CssBaseline />
