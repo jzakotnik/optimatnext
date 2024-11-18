@@ -29,8 +29,8 @@ export default async function handler(
     try {
       const calls = await fritz.getCalls(options);
       if (calls.error) return console.log("Error: " + calls.error.message);
-      //console.log("Got " + calls.length + "calls.");
-      //console.log("Calls", calls);
+      console.log("Got " + calls.length + "calls.");
+      console.log("Calls", calls);
       const missedCalls = calls.filter((c: any) => c.type === "missed");
       await writeKey("fritz", missedCalls);
 
