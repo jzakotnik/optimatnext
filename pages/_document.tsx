@@ -7,7 +7,6 @@ export default function Document() {
         {" "}
         <meta charSet="utf-8" />
         <meta name="mobile-web-app-capable" content="yes" />
-        <meta http-equiv="refresh" content="60" />
       </Head>
       <body>
         <Main />
