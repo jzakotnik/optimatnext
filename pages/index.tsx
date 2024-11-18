@@ -1,10 +1,6 @@
-import type { NextPage } from "next";
-import Head from "next/head";
-import { useRouter } from "next/router";
-
 import { ThemeProvider, createTheme } from "@mui/material/styles";
 import CssBaseline from "@mui/material/CssBaseline";
-import { Grid } from "@mui/material";
+import { Grid, Typography } from "@mui/material";
 import TrafficCard from "@/components/TrafficCard";
 import CO2SignalCard from "@/components/CO2SignalCard";
 import NewsCard from "@/components/NewsCard";
@@ -13,10 +9,9 @@ import CalendarCard from "@/components/CalendarCard";
 import FuelCard from "@/components/FuelCard";
 import WeatherCard from "@/components/WeatherCard";
 import TibberCard from "@/components/TibberCard";
-import useSWR from "swr";
-import fetcher from "@/utils/fetcher";
+
 import EnergyCard from "@/components/EnergyCard";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 
 const darkTheme = createTheme({
   palette: {
@@ -34,6 +29,7 @@ type IndexPageProps = {
   weather: any;
   tibber: any;
   energy: any;
+  lastUpdate: any;
 };
 
 export default function Home({
@@ -46,50 +42,106 @@ export default function Home({
   weather,
   tibber,
   energy,
+  lastUpdate,
 }: IndexPageProps) {
   const api = process.env.NEXT_PUBLIC_API_URL;
   const data = null;
-  console.log("Energy Index", energy);
-  //no caching for SWR, hence random string
-  /* const { data, error, isLoading } = useSWR(
-    "allAPIs" + Math.floor(Date.now() / 1000).toString(),
-    fetcher,
-    {
-      refreshInterval: parseInt(process.env.NEXT_PUBLIC_REFRESH_INTERVAL!),
-      refreshWhenHidden: true,
-    }
-  );*/
-  const router = useRouter();
-  const handleRefresh = () => {
-    router.reload();
-  };
-  /*console.log(
-    "SWR Data",
-    api,
-    data,
-    error,
-    isLoading,
-    parseInt(process.env.NEXT_PUBLIC_REFRESH_INTERVAL!)
-  );*/
-  /*const updatedTraffic = data?.data.traffic;
-  const updatedCo2 = data?.data.co2;
-  const updatedNews = data?.data.news;
-  const updatedPhone = data?.data.phone;
-  const updatedCalendar = data?.data.calendar;
-  const updatedFuel = data?.data.fuel;
-  const updatedWeather = data?.data.weather;
-  const updatedTibber = data?.data.tibber;
-*/
+  const [dashboardState, setDashboardState] = useState({
+    traffic: traffic,
+    co2: co2,
+    news: news,
+    phone: phone,
+    calendar: calendar,
+    fuel: fuel,
+    weather: weather,
+    tibber: tibber,
+    energy: energy,
+    lastUpdate: lastUpdate,
+  });
+
+  useEffect(() => {
+    const refreshAPI = async () => {
+      try {
+        const traffic = await fetch(
+          process.env.NEXT_PUBLIC_API_URL + "/api/traffic"
+        ).then((res) => res.json());
+
+        const co2 = await fetch(
+          process.env.NEXT_PUBLIC_API_URL + "/api/co2signal"
+        ).then((res) => res.json());
+
+        const news = await fetch(
+          process.env.NEXT_PUBLIC_API_URL + "/api/spiegelfeed"
+        ).then((res) => res.json());
+
+        const phone = await fetch(
+          process.env.NEXT_PUBLIC_API_URL + "/api/fritz"
+        ).then((res) => res.json());
+
+        const calendar = await fetch(
+          process.env.NEXT_PUBLIC_API_URL + "/api/calendar"
+        ).then((res) => res.json());
+
+        const fuel = await fetch(
+          process.env.NEXT_PUBLIC_API_URL + "/api/fuel"
+        ).then((res) => res.json());
+
+        const weather = await fetch(
+          process.env.NEXT_PUBLIC_API_URL + "/api/weather"
+        ).then((res) => res.json());
+
+        const tibber = await fetch(
+          process.env.NEXT_PUBLIC_API_URL + "/api/tibber"
+        ).then((res) => res.json());
+
+        const energy = await fetch(
+          process.env.NEXT_PUBLIC_API_URL + "/api/alphaess"
+        ).then((res) => res.json());
+
+        // Pass data to the page via props
+
+        const lastUpdate = new Date().toLocaleTimeString();
+
+        setDashboardState({
+          traffic: traffic,
+          co2: co2,
+          news: news,
+          phone: phone,
+          calendar: calendar,
+          fuel: fuel,
+          weather: weather,
+          tibber: tibber,
+          energy: energy,
+          lastUpdate: lastUpdate,
+        });
+      } catch (error) {
+        console.error("Error fetching data:", error);
+        setDashboardState({
+          ...dashboardState,
+          lastUpdate: lastUpdate + " - API Fehler",
+        });
+      }
+    };
+
+    console.log("Energy Index", energy);
+
+    const interval = setInterval(refreshAPI, 5000); // 30000 milliseconds = 30 seconds
+  }, []);
+
+  // Cleanup the interval on component unmount
 
   return (
     <ThemeProvider theme={darkTheme}>
       <CssBaseline />
+
       <Grid
         container
         direction="column"
         justifyContent="space-around"
         alignItems="stretch"
+        height={"100vh"}
       >
+        {" "}
         <Grid
           container
           item
@@ -97,34 +149,23 @@ export default function Home({
           justifyContent="space-around"
           alignItems="stretch"
         >
-          <Grid item sx={{ m: 1 }}>
-            <TrafficCard traffic={traffic} />
+          <Grid item sx={{ mx: 1, my: 0.2 }}>
+            <TrafficCard traffic={dashboardState.traffic} />
           </Grid>
-          <Grid item sx={{ m: 1 }}>
-            <CO2SignalCard co2={co2} />
+          <Grid item sx={{ mx: 1, my: 0.2 }}>
+            <CO2SignalCard co2={dashboardState.co2} />
           </Grid>
-          <Grid item sx={{ m: 1 }}>
-            <EnergyCard energy={energy} />
+          <Grid item sx={{ mx: 1, my: 0.2 }}>
+            <EnergyCard energy={dashboardState.energy} />
           </Grid>
-          <Grid item sx={{ m: 1 }}>
-            <WeatherCard weather={weather} />
+          <Grid item sx={{ mx: 1, my: 0.2 }}>
+            <WeatherCard weather={dashboardState.weather} />
           </Grid>
-          <Grid item sx={{ m: 1 }}>
-            <TibberCard tibber={tibber} />
+          <Grid item sx={{ mx: 1, my: 0.2 }}>
+            <TibberCard tibber={dashboardState.tibber} />
           </Grid>
-          <Grid item sx={{ m: 1 }}>
-            <FuelCard fuel={fuel} />
-          </Grid>
-        </Grid>
-        <Grid
-          container
-          item
-          direction="row"
-          justifyContent="space-around"
-          alignItems="center"
-        >
-          <Grid item sx={{ m: 1, width: "100%" }}>
-            <NewsCard news={news} />
+          <Grid item sx={{ mx: 1 }}>
+            <FuelCard fuel={dashboardState.fuel} />
           </Grid>
         </Grid>
         <Grid
@@ -134,11 +175,25 @@ export default function Home({
           justifyContent="space-around"
           alignItems="center"
         >
-          <Grid item sx={{ m: 1 }}>
-            <PhoneCard phone={phone} />
+          <Grid item sx={{ m: 1, my: 0.2, width: "100%" }}>
+            <NewsCard
+              news={dashboardState.news}
+              lastUpdate={dashboardState.lastUpdate}
+            />
           </Grid>
-          <Grid item sx={{ m: 1 }}>
-            <CalendarCard calendar={calendar} />
+        </Grid>
+        <Grid
+          container
+          item
+          direction="row"
+          justifyContent="space-around"
+          alignItems="center"
+        >
+          <Grid item sx={{ mx: 1, my: 0.2 }}>
+            <PhoneCard phone={dashboardState.phone} />
+          </Grid>
+          <Grid item sx={{ mx: 1, my: 0.2 }}>
+            <CalendarCard calendar={dashboardState.calendar} />
           </Grid>
         </Grid>
       </Grid>
@@ -193,6 +248,7 @@ export const getServerSideProps = async () => {
   );
   const energy = await energyresponse.json();
   console.log("Energy api", energy);
+  const lastUpdate = new Date().toLocaleTimeString();
 
   // Pass data to the page via props
   return {
@@ -206,6 +262,7 @@ export const getServerSideProps = async () => {
       weather,
       tibber,
       energy,
+      lastUpdate,
     },
   };
 };

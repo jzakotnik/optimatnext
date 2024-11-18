@@ -42,7 +42,7 @@ export default function CalendarCard({ calendar }: CalendarCardProps) {
 
   console.log("Rendering calendar", new Date().toLocaleString(), calendar);
   calendar.items.map((c: any) => {
-    console.log("Start Time", c.startTime);
+    //console.log("Start Time", c.startTime);
   });
   let formattedCalendar = ["Fehler"];
   try {

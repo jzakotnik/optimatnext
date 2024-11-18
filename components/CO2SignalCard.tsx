@@ -55,7 +55,7 @@ export default function CO2SignalCard({ co2 }: CO2SignalCardProps) {
       />
       <CardContent>
         <Typography variant="h5" sx={{ fontWeight: "bold" }}>
-          CO2 im Strommix
+          CO2 Mix
         </Typography>
       </CardContent>
     </Card>
