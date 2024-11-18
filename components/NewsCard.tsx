@@ -11,6 +11,7 @@ import FeedIcon from "@mui/icons-material/Feed";
 
 type NewsCardProps = {
   news: any;
+  lastUpdate: string;
 };
 
 const headerSX = {
@@ -18,7 +19,10 @@ const headerSX = {
   "& .MuiCardHeader-action": { m: "0px auto", alignSelf: "center" },
 };
 
-export default function NewsCard({ news }: NewsCardProps) {
+export default function NewsCard({
+  news,
+  lastUpdate = "Letztes Update..",
+}: NewsCardProps) {
   const theme = useTheme();
   console.log("Rendering news", new Date().toLocaleString(), news);
   return (
@@ -41,7 +45,7 @@ export default function NewsCard({ news }: NewsCardProps) {
         titleTypographyProps={{ variant: "h5", fontWeight: "bold" }}
         title={
           <Typography variant="h5" sx={{ fontWeight: "bold" }}>
-            Spiegel Online News
+            {"Spiegel Online um " + lastUpdate}
           </Typography>
         }
         avatar={

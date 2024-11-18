@@ -133,6 +133,7 @@ export default function Home({
   return (
     <ThemeProvider theme={darkTheme}>
       <CssBaseline />
+      <Typography>{"Last Update " + dashboardState.lastUpdate}</Typography>
       <Grid
         container
         direction="column"
@@ -140,6 +141,7 @@ export default function Home({
         alignItems="stretch"
         height={"100vh"}
       >
+        {" "}
         <Grid
           container
           item
@@ -174,7 +176,10 @@ export default function Home({
           alignItems="center"
         >
           <Grid item sx={{ m: 1, my: 0.2, width: "100%" }}>
-            <NewsCard news={dashboardState.news} />
+            <NewsCard
+              news={dashboardState.news}
+              lastUpdate={dashboardState.lastUpdate}
+            />
           </Grid>
         </Grid>
         <Grid
@@ -190,9 +195,6 @@ export default function Home({
           <Grid item sx={{ mx: 1, my: 0.2 }}>
             <CalendarCard calendar={dashboardState.calendar} />
           </Grid>
-        </Grid>
-        <Grid item sx={{ mx: 1, my: 0.2 }}>
-          <Typography>{"Last Update " + dashboardState.lastUpdate}</Typography>
         </Grid>
       </Grid>
     </ThemeProvider>
