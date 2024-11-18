@@ -36,12 +36,12 @@ export default async function handler(
 
       res.status(200).json({ key: "fritz", items: missedCalls.slice(0, 10) });
     } catch (e: any) {
-      console.log("Cache refresh went wrong", e);
+      console.warn("Cache refresh for phone data went wrong", e);
       res.status(200).json({ key: "fritz", items: {} });
     }
   } //this is a cache hit
   else {
-    console.log("Used cache for phone data", cachedData.data.payload);
+    //console.log("Used cache for phone data", cachedData.data.payload);
     res.status(200).json({
       key: "fritz",
       items: JSON.parse(cachedData.data.payload).slice(0, 10),

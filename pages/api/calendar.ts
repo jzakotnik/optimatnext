@@ -68,7 +68,7 @@ export default async function handler(
       });
     }
   } catch (e: any) {
-    console.log("ERROR getting calendar data");
+    console.warn("Cache refresh for calendar went wrong", e);
     res.status(200).json({
       key: "calendar",
       items: JSON.parse(cachedData.data.payload),

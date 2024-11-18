@@ -18,25 +18,33 @@ export default async function handler(
 
   if (isNaN(cacheSeconds) || cacheSeconds > parseInt(CO2SIGNAL_CACHE_SECONDS)) {
     console.log("Refreshing Cache for Co2");
-    const co2signal = await fetch(CO2SIGNAL_URL, {
-      headers: {
-        "auth-token": CO2SIGNAL_APIKEY,
-        "Content-Type": "application/json",
-      },
-    });
-    if (!co2signal.ok) {
-      console.log("CO2 Request failed", co2signal);
+    try {
+      const co2signal = await fetch(CO2SIGNAL_URL, {
+        headers: {
+          "auth-token": CO2SIGNAL_APIKEY,
+          "Content-Type": "application/json",
+        },
+      });
+      if (!co2signal.ok) {
+        console.log("CO2 Request failed", co2signal);
+        res.status(200).json({
+          key: "co2signal",
+          items: {},
+        });
+      }
+      const response = await co2signal.json();
+      await writeKey("co2signal", response as any);
+      res.status(200).json({
+        key: "CO2",
+        items: response,
+      });
+    } catch (e: any) {
+      console.warn("Cache refresh for co2signal went wrong", e);
       res.status(200).json({
         key: "co2signal",
-        items: {},
+        items: JSON.parse(cachedData.data.payload),
       });
     }
-    const response = await co2signal.json();
-    await writeKey("co2signal", response as any);
-    res.status(200).json({
-      key: "CO2",
-      items: response,
-    });
   } else {
     //console.log("Used cache for CO2 Signal");
     res.status(200).json({

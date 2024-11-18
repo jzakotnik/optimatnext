@@ -27,25 +27,30 @@ export default async function handler(
 
   if (isNaN(cacheSeconds) || cacheSeconds > parseInt(ALPHAESS_CACHE_SECONDS)) {
     console.log("Refreshing Cache for alphaess");
-    const data = await fetch(
-      location +
-        "?" +
-        new URLSearchParams({
-          sysSn: systemsn,
-        }),
-      {
-        method: "GET",
+    try {
+      const data = await fetch(
+        location +
+          "?" +
+          new URLSearchParams({
+            sysSn: systemsn,
+          }),
+        {
+          method: "GET",
 
-        headers: {
-          "Content-Type": "application/json",
-          appId: appid,
-          timeStamp: timestamp,
-          sign: signRequest(timestamp),
-        },
-      }
-    ).then((res) => res.json());
-    await writeKey("alphaess", data as any);
-    res.status(200).json({ key: "alphaess", energy: data });
+          headers: {
+            "Content-Type": "application/json",
+            appId: appid,
+            timeStamp: timestamp,
+            sign: signRequest(timestamp),
+          },
+        }
+      ).then((res) => res.json());
+      await writeKey("alphaess", data as any);
+      res.status(200).json({ key: "alphaess", energy: data });
+    } catch (e: any) {
+      console.warn("Cache refresh for alphaess went wrong", e);
+      res.status(200).json({ key: "alpha", items: {} });
+    }
   } else {
     //console.log("Used cache for alphaess");
     res.status(200).json({
