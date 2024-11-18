@@ -133,7 +133,7 @@ export default function Home({
   return (
     <ThemeProvider theme={darkTheme}>
       <CssBaseline />
-      <Typography>{"Last Update " + dashboardState.lastUpdate}</Typography>
+
       <Grid
         container
         direction="column"
