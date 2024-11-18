@@ -139,7 +139,6 @@ export default function Home({
         direction="column"
         justifyContent="space-around"
         alignItems="stretch"
-        height={"100vh"}
       >
         {" "}
         <Grid
