@@ -15,17 +15,24 @@ export default async function handler(
   const cachedData = await readKey("weather");
   //console.log("Cached Data last Update", cachedData.age);
   const cacheSeconds = cachedData.age;
+  try {
+    if (isNaN(cacheSeconds) || cacheSeconds > parseInt(WEATHER_CACHE_SECONDS)) {
+      console.log("Refreshing Cache for Weather");
+      const weather = await fetch(requestURL);
+      const data = await weather.json();
+      const singleData = data.main.temp;
+      await writeKey("weather", singleData as any);
 
-  if (isNaN(cacheSeconds) || cacheSeconds > parseInt(WEATHER_CACHE_SECONDS)) {
-    console.log("Refreshing Cache for Weather");
-    const weather = await fetch(requestURL);
-    const data = await weather.json();
-    const singleData = data.main.temp;
-    await writeKey("weather", singleData as any);
-
-    res.status(200).json({ key: "weather", items: singleData });
-  } else {
-    //console.log("Used cache for weather");
+      res.status(200).json({ key: "weather", items: singleData });
+    } else {
+      //console.log("Used cache for weather");
+      res.status(200).json({
+        key: "weather",
+        items: JSON.parse(cachedData.data.payload),
+      });
+    }
+  } catch (e: any) {
+    console.warn("Cache refresh for weather went wrong", e);
     res.status(200).json({
       key: "weather",
       items: JSON.parse(cachedData.data.payload),

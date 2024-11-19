@@ -16,18 +16,25 @@ export default async function handler(
   const cachedData = await readKey("traffic");
   //console.log("Cached Data last Update", cachedData.age);
   const cacheSeconds = cachedData.age;
-
-  if (isNaN(cacheSeconds) || cacheSeconds > parseInt(TRAFFIC_CACHE_SECONDS)) {
-    console.log("Refreshing Cache for Traffic");
-    const traffic = await fetch(requestURL);
-    const data = await traffic.json();
-    const convertedDuration = data.rows[0].elements[0].duration_in_traffic
-      .value as number; //duration in seconds
-    const durationMinutes = Math.round(convertedDuration / 60);
-    await writeKey("traffic", durationMinutes as any);
-    res.status(200).json({ key: "traffic", items: durationMinutes });
-  } else {
-    //console.log("Used cache for traffic");
+  try {
+    if (isNaN(cacheSeconds) || cacheSeconds > parseInt(TRAFFIC_CACHE_SECONDS)) {
+      console.log("Refreshing Cache for Traffic");
+      const traffic = await fetch(requestURL);
+      const data = await traffic.json();
+      const convertedDuration = data.rows[0].elements[0].duration_in_traffic
+        .value as number; //duration in seconds
+      const durationMinutes = Math.round(convertedDuration / 60);
+      await writeKey("traffic", durationMinutes as any);
+      res.status(200).json({ key: "traffic", items: durationMinutes });
+    } else {
+      //console.log("Used cache for traffic");
+      res.status(200).json({
+        key: "traffic",
+        items: JSON.parse(cachedData.data.payload),
+      });
+    }
+  } catch (e: any) {
+    console.warn("Cache refresh for traffic went wrong", e);
     res.status(200).json({
       key: "traffic",
       items: JSON.parse(cachedData.data.payload),

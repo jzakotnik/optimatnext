@@ -51,22 +51,29 @@ export default async function handler(
   const cachedData = await readKey("tibber");
   //console.log("Cached Data last Update", cachedData.age);
   const cacheSeconds = cachedData.age;
+  try {
+    if (isNaN(cacheSeconds) || cacheSeconds > parseInt(TIBBER_CACHE_SECONDS)) {
+      console.log("Refreshing Cache for Tibber");
+      const data = await fetch(location, {
+        method: "POST",
+        body: JSON.stringify(query),
 
-  if (isNaN(cacheSeconds) || cacheSeconds > parseInt(TIBBER_CACHE_SECONDS)) {
-    console.log("Refreshing Cache for Tibber");
-    const data = await fetch(location, {
-      method: "POST",
-      body: JSON.stringify(query),
-
-      headers: {
-        "Content-Type": "application/json",
-        Authorization: "Bearer " + apikey,
-      },
-    }).then((res) => res.json());
-    await writeKey("tibber", data as any);
-    res.status(200).json({ key: "tibber", price: data });
-  } else {
-    //console.log("Used cache for tibber");
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: "Bearer " + apikey,
+        },
+      }).then((res) => res.json());
+      await writeKey("tibber", data as any);
+      res.status(200).json({ key: "tibber", price: data });
+    } else {
+      //console.log("Used cache for tibber");
+      res.status(200).json({
+        key: "tibber",
+        items: JSON.parse(cachedData.data.payload),
+      });
+    }
+  } catch (e: any) {
+    console.warn("Cache refresh for tibber went wrong", e);
     res.status(200).json({
       key: "tibber",
       items: JSON.parse(cachedData.data.payload),
