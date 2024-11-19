@@ -27,6 +27,7 @@ export default async function handler(
     console.log("Refreshing Cache for Fritz");
 
     try {
+      console.log("Getting fritz.getCalls now..");
       const calls = await fritz.getCalls(options);
       if (calls.error) return console.log("Error: " + calls.error.message);
       console.log("Got " + calls.length + "calls.");
