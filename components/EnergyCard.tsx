@@ -25,62 +25,66 @@ const headerSX = {
 export default function EnergyCard({ energy }: EnergyCardProps) {
   const theme = useTheme();
   console.log("Rendering energy", new Date().toLocaleString(), energy);
-  return (
-    <Card
-      elevation={1}
-      sx={{
-        border: "1px solid",
-        borderRadius: 2,
-        borderColor: "#FFFFF",
-        height: "100%",
-      }}
-    >
-      <CardHeader
-        title={
-          <Grid
-            container
-            direction="row"
-            justifyContent="space-around"
-            alignItems="stretch"
-          >
-            <Grid item sx={{ mx: 1 }}>
-              {" "}
-              {energy.energy.data.ppv - energy.energy.data.pgrid < 0 ? (
-                <ArrowCircleDownIcon />
-              ) : (
-                <ArrowCircleUpIcon />
-              )}
+  try {
+    return (
+      <Card
+        elevation={1}
+        sx={{
+          border: "1px solid",
+          borderRadius: 2,
+          borderColor: "#FFFFF",
+          height: "100%",
+        }}
+      >
+        <CardHeader
+          title={
+            <Grid
+              container
+              direction="row"
+              justifyContent="space-around"
+              alignItems="stretch"
+            >
+              <Grid item sx={{ mx: 1 }}>
+                {" "}
+                {energy.energy.data.ppv - energy.energy.data.pgrid < 0 ? (
+                  <ArrowCircleDownIcon />
+                ) : (
+                  <ArrowCircleUpIcon />
+                )}
+              </Grid>
+              <Grid item>
+                {" "}
+                <Typography variant="h5" sx={{ fontWeight: "bold" }}>
+                  {"PV"}
+                </Typography>
+              </Grid>
             </Grid>
-            <Grid item>
-              {" "}
-              <Typography variant="h5" sx={{ fontWeight: "bold" }}>
-                {"PV"}
-              </Typography>
-            </Grid>
-          </Grid>
-        }
-        avatar={
-          <Avatar
-            sx={{
-              bgcolor: getColor(energy.energy.data.pgrid, 80, 300, false),
-            }}
-            aria-label="icon"
-          >
-            <SolarPowerIcon />
-          </Avatar>
-        }
-      />
-      <CardContent>
-        <Typography variant="h5" sx={{ fontWeight: "bold" }}>
-          {"PV: " + energy.energy.data.ppv.toString() + " W"}
-        </Typography>
-        <Typography variant="h5" sx={{ fontWeight: "bold" }}>
-          {"Grid: " + energy.energy.data.pgrid.toString() + " W"}{" "}
-        </Typography>
-        <Typography variant="h5" sx={{ fontWeight: "bold" }}>
-          {"Akku: " + energy.energy.data.soc.toString() + " %"}
-        </Typography>
-      </CardContent>
-    </Card>
-  );
+          }
+          avatar={
+            <Avatar
+              sx={{
+                bgcolor: getColor(energy.energy.data.pgrid, 80, 300, false),
+              }}
+              aria-label="icon"
+            >
+              <SolarPowerIcon />
+            </Avatar>
+          }
+        />
+        <CardContent>
+          <Typography variant="h5" sx={{ fontWeight: "bold" }}>
+            {"PV: " + energy.energy.data.ppv.toString() + " W"}
+          </Typography>
+          <Typography variant="h5" sx={{ fontWeight: "bold" }}>
+            {"Grid: " + energy.energy.data.pgrid.toString() + " W"}{" "}
+          </Typography>
+          <Typography variant="h5" sx={{ fontWeight: "bold" }}>
+            {"Akku: " + energy.energy.data.soc.toString() + " %"}
+          </Typography>
+        </CardContent>
+      </Card>
+    );
+  } catch (e: any) {
+    return <Typography>Datenfehler {e.toString()}</Typography>;
+  }
 }

@@ -41,44 +41,46 @@ export default function CalendarCard({ calendar }: CalendarCardProps) {
   const theme = useTheme();
 
   console.log("Rendering calendar", new Date().toLocaleString(), calendar);
-  calendar.items.map((c: any) => {
-    //console.log("Start Time", c.startTime);
-  });
+
   let formattedCalendar = ["Fehler"];
   try {
     formattedCalendar = calendar.items.map((i: any) => formatCalendar(i));
   } catch (e: any) {
     console.log("ERROR formatting calendar items");
   }
-  return (
-    <Card
-      elevation={1}
-      sx={{
-        border: "1px solid",
-        borderRadius: 2,
-        borderColor: "#FFFFF",
-        height: "100%",
-      }}
-    >
-      <CardHeader
-        title={
-          <Typography variant="h5" sx={{ fontWeight: "bold" }}>
-            Kalender
-          </Typography>
-        }
-        avatar={
-          <Avatar sx={{ bgcolor: "#FAEAFF" }} aria-label="icon">
-            <CalendarMonthIcon />
-          </Avatar>
-        }
-      />
-      <CardContent>
-        {formattedCalendar.slice(0, 5).map((n: any, i: number) => (
-          <Typography variant="h5" sx={{ fontWeight: "bold" }} key={i}>
-            {n}
-          </Typography>
-        ))}
-      </CardContent>
-    </Card>
-  );
+  try {
+    return (
+      <Card
+        elevation={1}
+        sx={{
+          border: "1px solid",
+          borderRadius: 2,
+          borderColor: "#FFFFF",
+          height: "100%",
+        }}
+      >
+        <CardHeader
+          title={
+            <Typography variant="h5" sx={{ fontWeight: "bold" }}>
+              Kalender
+            </Typography>
+          }
+          avatar={
+            <Avatar sx={{ bgcolor: "#FAEAFF" }} aria-label="icon">
+              <CalendarMonthIcon />
+            </Avatar>
+          }
+        />
+        <CardContent>
+          {formattedCalendar.slice(0, 5).map((n: any, i: number) => (
+            <Typography variant="h5" sx={{ fontWeight: "bold" }} key={i}>
+              {n}
+            </Typography>
+          ))}
+        </CardContent>
+      </Card>
+    );
+  } catch (e: any) {
+    return <Typography>Datenfehler Kalender {e.toString()}</Typography>;
+  }
 }
