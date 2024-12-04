@@ -24,6 +24,7 @@ export default async function handler(
   const timestamp = dayjs(new Date()).unix().toString();
   //console.log("Cached Data last Update", cachedData.age);
   const cacheSeconds = cachedData.age;
+  var responseDebug = undefined;
 
   if (isNaN(cacheSeconds) || cacheSeconds > parseInt(ALPHAESS_CACHE_SECONDS)) {
     console.log("Refreshing Cache for alphaess");
@@ -44,14 +45,22 @@ export default async function handler(
             sign: signRequest(timestamp),
           },
         }
-      ).then((res) => {
-        console.log("Alpha ESS Response body", res);
-        res.json();
+      ).then(async (res) => {
+        responseDebug = res;
+        const responseText = await res.text(); // Read response as text
+        try {
+          return JSON.parse(responseText); // Try parsing the text as JSON
+        } catch (error) {
+          console.error("Failed to parse JSON:", error);
+          console.log("Response text was:", responseText);
+          throw new Error("Response was not valid JSON");
+        }
       });
       await writeKey("alphaess", data as any);
       res.status(200).json({ key: "alphaess", energy: data });
     } catch (e: any) {
       console.warn("Cache refresh for alphaess went wrong", e);
+      console.log("Response debug", responseDebug);
 
       res.status(200).json({ key: "alpha", items: {} });
     }
