@@ -44,11 +44,15 @@ export default async function handler(
             sign: signRequest(timestamp),
           },
         }
-      ).then((res) => res.json());
+      ).then((res) => {
+        console.log("Alpha ESS Response body", res);
+        res.json();
+      });
       await writeKey("alphaess", data as any);
       res.status(200).json({ key: "alphaess", energy: data });
     } catch (e: any) {
       console.warn("Cache refresh for alphaess went wrong", e);
+
       res.status(200).json({ key: "alpha", items: {} });
     }
   } else {
