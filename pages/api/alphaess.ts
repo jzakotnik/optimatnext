@@ -49,7 +49,8 @@ export default async function handler(
         responseDebug = res;
         const responseText = await res.text(); // Read response as text
         try {
-          return JSON.parse(responseText); // Try parsing the text as JSON
+          const responseJSON = JSON.parse(responseText); // Try parsing the text as JSON
+          return responseJSON;
         } catch (error) {
           console.error("Failed to parse JSON:", error);
           console.log("Response text was:", responseText);
