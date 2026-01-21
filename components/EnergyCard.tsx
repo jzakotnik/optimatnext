@@ -3,88 +3,101 @@ import {
   Card,
   CardContent,
   CardHeader,
-  Grid,
   Typography,
-  useTheme,
 } from "@mui/material";
-import DirectionsCarFilledIcon from "@mui/icons-material/DirectionsCarFilled";
+import Grid from "@mui/material/Grid";
 import SolarPowerIcon from "@mui/icons-material/SolarPower";
 import ArrowCircleDownIcon from "@mui/icons-material/ArrowCircleDown";
 import ArrowCircleUpIcon from "@mui/icons-material/ArrowCircleUp";
 import getColor from "@/utils/getColor";
 
-type EnergyCardProps = {
-  energy: any;
-};
+interface EnergyData {
+  ppv: number;
+  pgrid: number;
+  soc: number;
+}
 
-const headerSX = {
-  p: 2.5,
-  "& .MuiCardHeader-action": { m: "0px auto", alignSelf: "center" },
-};
+interface EnergyCardProps {
+  energy: {
+    energy: {
+      data: EnergyData;
+    };
+  } | null;
+}
 
 export default function EnergyCard({ energy }: EnergyCardProps) {
-  const theme = useTheme();
-  console.log("Rendering energy", new Date().toLocaleString(), energy);
-  try {
+  // Handle null/undefined energy data
+  if (!energy?.energy?.data) {
     return (
       <Card
         elevation={1}
         sx={{
           border: "1px solid",
           borderRadius: 2,
-          borderColor: "#FFFFF",
+          borderColor: "#FFFFFF",
           height: "100%",
         }}
       >
-        <CardHeader
-          title={
-            <Grid
-              container
-              direction="row"
-              justifyContent="space-around"
-              alignItems="stretch"
-            >
-              <Grid item sx={{ mx: 1 }}>
-                {" "}
-                {energy.energy.data.ppv - energy.energy.data.pgrid < 0 ? (
-                  <ArrowCircleDownIcon />
-                ) : (
-                  <ArrowCircleUpIcon />
-                )}
-              </Grid>
-              <Grid item>
-                {" "}
-                <Typography variant="h5" sx={{ fontWeight: "bold" }}>
-                  {"PV"}
-                </Typography>
-              </Grid>
-            </Grid>
-          }
-          avatar={
-            <Avatar
-              sx={{
-                bgcolor: getColor(energy.energy.data.pgrid, 80, 300, false),
-              }}
-              aria-label="icon"
-            >
-              <SolarPowerIcon />
-            </Avatar>
-          }
-        />
         <CardContent>
-          <Typography variant="h5" sx={{ fontWeight: "bold" }}>
-            {"PV: " + energy.energy.data.ppv.toString() + " W"}
-          </Typography>
-          <Typography variant="h5" sx={{ fontWeight: "bold" }}>
-            {"Grid: " + energy.energy.data.pgrid.toString() + " W"}{" "}
-          </Typography>
-          <Typography variant="h5" sx={{ fontWeight: "bold" }}>
-            {"Akku: " + energy.energy.data.soc.toString() + " %"}
-          </Typography>
+          <Typography>Keine Energiedaten</Typography>
         </CardContent>
       </Card>
     );
-  } catch (e: any) {
-    return <Typography>Datenfehler {e.toString()}</Typography>;
   }
+
+  const { ppv, pgrid, soc } = energy.energy.data;
+  const isExporting = ppv - pgrid >= 0;
+
+  return (
+    <Card
+      elevation={1}
+      sx={{
+        border: "1px solid",
+        borderRadius: 2,
+        borderColor: "#FFFFFF",
+        height: "100%",
+      }}
+    >
+      <CardHeader
+        title={
+          <Grid
+            container
+            direction="row"
+            justifyContent="space-around"
+            alignItems="stretch"
+          >
+            <Grid sx={{ mx: 1 }}>
+              {isExporting ? <ArrowCircleUpIcon /> : <ArrowCircleDownIcon />}
+            </Grid>
+            <Grid>
+              <Typography variant="h5" sx={{ fontWeight: "bold" }}>
+                PV
+              </Typography>
+            </Grid>
+          </Grid>
+        }
+        avatar={
+          <Avatar
+            sx={{
+              bgcolor: getColor(pgrid, 80, 300, false),
+            }}
+            aria-label="icon"
+          >
+            <SolarPowerIcon />
+          </Avatar>
+        }
+      />
+      <CardContent>
+        <Typography variant="h5" sx={{ fontWeight: "bold" }}>
+          {`PV: ${ppv} W`}
+        </Typography>
+        <Typography variant="h5" sx={{ fontWeight: "bold" }}>
+          {`Grid: ${pgrid} W`}
+        </Typography>
+        <Typography variant="h5" sx={{ fontWeight: "bold" }}>
+          {`Akku: ${soc} %`}
+        </Typography>
+      </CardContent>
+    </Card>
+  );
 }

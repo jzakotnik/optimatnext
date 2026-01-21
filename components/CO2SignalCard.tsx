@@ -4,50 +4,62 @@ import {
   CardContent,
   CardHeader,
   Typography,
-  useTheme,
 } from "@mui/material";
 import EnergySavingsLeafIcon from "@mui/icons-material/EnergySavingsLeaf";
 import getColor from "@/utils/getColor";
 
-type CO2SignalCardProps = {
-  co2: any;
-};
+interface CO2Data {
+  items?: {
+    data?: {
+      fossilFuelPercentage: number | string;
+    };
+  };
+}
 
-const headerSX = {
-  fontWeight: "bold",
-  p: 2.5,
-};
+interface CO2SignalCardProps {
+  co2: CO2Data | null;
+}
 
 export default function CO2SignalCard({ co2 }: CO2SignalCardProps) {
-  const theme = useTheme();
-  console.log("Rendering co2", new Date().toLocaleString(), co2);
-  let percentage = 0;
-  if ("data" in co2.items)
-    percentage = parseInt(co2.items.data.fossilFuelPercentage);
+  // Handle null/undefined data
+  if (!co2?.items?.data) {
+    return (
+      <Card
+        elevation={1}
+        sx={{
+          border: "1px solid",
+          borderRadius: 2,
+          borderColor: "#FFFFFF",
+          height: "100%",
+        }}
+      >
+        <CardContent>
+          <Typography>Keine CO2-Daten</Typography>
+        </CardContent>
+      </Card>
+    );
+  }
+
+  const percentage = Math.round(Number(co2.items.data.fossilFuelPercentage));
+
   return (
     <Card
       elevation={1}
       sx={{
         border: "1px solid",
         borderRadius: 2,
-        borderColor: "#FFFFF",
+        borderColor: "#FFFFFF",
         height: "100%",
-        "& pre": {
-          m: 0,
-          p: "16px !important",
-          fontFamily: theme.typography.fontFamily,
-          fontSize: "0.75rem",
-        },
       }}
     >
       <CardHeader
-        sx={headerSX}
+        sx={{ fontWeight: "bold", p: 2.5 }}
         titleTypographyProps={{ variant: "h5", fontWeight: "bold" }}
-        title={percentage + " %"}
+        title={`${percentage} %`}
         avatar={
           <Avatar
             sx={{ bgcolor: getColor(percentage, 30, 60) }}
-            aria-label="icon"
+            aria-label="CO2 fossil fuel percentage"
           >
             <EnergySavingsLeafIcon />
           </Avatar>

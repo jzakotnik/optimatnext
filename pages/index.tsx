@@ -1,6 +1,6 @@
 import { ThemeProvider, createTheme } from "@mui/material/styles";
 import CssBaseline from "@mui/material/CssBaseline";
-import { Grid, Typography } from "@mui/material";
+import Grid from "@mui/material/Grid"; // MUI v7 uses Grid2 as the default Grid
 import TrafficCard from "@/components/TrafficCard";
 import CO2SignalCard from "@/components/CO2SignalCard";
 import NewsCard from "@/components/NewsCard";
@@ -9,9 +9,8 @@ import CalendarCard from "@/components/CalendarCard";
 import FuelCard from "@/components/FuelCard";
 import WeatherCard from "@/components/WeatherCard";
 import TibberCard from "@/components/TibberCard";
-
 import EnergyCard from "@/components/EnergyCard";
-import { useEffect, useState } from "react";
+import { useEffect, useState, useCallback } from "react";
 
 const darkTheme = createTheme({
   palette: {
@@ -19,18 +18,51 @@ const darkTheme = createTheme({
   },
 });
 
-type IndexPageProps = {
-  traffic: any;
-  co2: any;
-  news: any;
-  phone: any;
-  calendar: any;
-  fuel: any;
-  weather: any;
-  tibber: any;
-  energy: any;
-  lastUpdate: any;
-};
+// Define types for API responses
+// TODO: Replace these with actual API response types for full type safety
+interface EnergyData {
+  energy: {
+    data: {
+      ppv: number;
+      pgrid: number;
+      soc: number;
+    };
+  };
+}
+
+interface CO2Data {
+  items?: {
+    data?: {
+      fossilFuelPercentage: number | string;
+    };
+  };
+}
+
+interface DashboardState {
+  traffic: Record<string, unknown> | null;
+  co2: CO2Data | null;
+  news: Record<string, unknown> | null;
+  phone: Record<string, unknown> | null;
+  calendar: Record<string, unknown> | null;
+  fuel: Record<string, unknown> | null;
+  weather: Record<string, unknown> | null;
+  tibber: Record<string, unknown> | null;
+  energy: EnergyData | null;
+  lastUpdate: string;
+}
+
+interface IndexPageProps {
+  traffic: Record<string, unknown> | null;
+  co2: CO2Data | null;
+  news: Record<string, unknown> | null;
+  phone: Record<string, unknown> | null;
+  calendar: Record<string, unknown> | null;
+  fuel: Record<string, unknown> | null;
+  weather: Record<string, unknown> | null;
+  tibber: Record<string, unknown> | null;
+  energy: EnergyData | null;
+  lastUpdate: string;
+}
 
 export default function Home({
   traffic,
@@ -44,154 +76,154 @@ export default function Home({
   energy,
   lastUpdate,
 }: IndexPageProps) {
-  const api = process.env.NEXT_PUBLIC_API_URL;
-  const data = null;
-  const [dashboardState, setDashboardState] = useState({
-    traffic: traffic,
-    co2: co2,
-    news: news,
-    phone: phone,
-    calendar: calendar,
-    fuel: fuel,
-    weather: weather,
-    tibber: tibber,
-    energy: energy,
-    lastUpdate: lastUpdate,
+  const [dashboardState, setDashboardState] = useState<DashboardState>({
+    traffic,
+    co2,
+    news,
+    phone,
+    calendar,
+    fuel,
+    weather,
+    tibber,
+    energy,
+    lastUpdate,
   });
 
-  useEffect(() => {
-    const refreshAPI = async () => {
-      try {
-        const traffic = await fetch(
-          process.env.NEXT_PUBLIC_API_URL + "/api/traffic"
-        ).then((res) => res.json());
+  const refreshAPI = useCallback(async () => {
+    const apiUrl = process.env.NEXT_PUBLIC_API_URL;
 
-        const co2 = await fetch(
-          process.env.NEXT_PUBLIC_API_URL + "/api/co2signal"
-        ).then((res) => res.json());
+    try {
+      const [
+        trafficRes,
+        co2Res,
+        newsRes,
+        phoneRes,
+        calendarRes,
+        fuelRes,
+        weatherRes,
+        tibberRes,
+        energyRes,
+      ] = await Promise.all([
+        fetch(`${apiUrl}/api/traffic`),
+        fetch(`${apiUrl}/api/co2signal`),
+        fetch(`${apiUrl}/api/spiegelfeed`),
+        fetch(`${apiUrl}/api/fritz`),
+        fetch(`${apiUrl}/api/calendar`),
+        fetch(`${apiUrl}/api/fuel`),
+        fetch(`${apiUrl}/api/weather`),
+        fetch(`${apiUrl}/api/tibber`),
+        fetch(`${apiUrl}/api/alphaess`),
+      ]);
 
-        const news = await fetch(
-          process.env.NEXT_PUBLIC_API_URL + "/api/spiegelfeed"
-        ).then((res) => res.json());
+      const [
+        trafficData,
+        co2Data,
+        newsData,
+        phoneData,
+        calendarData,
+        fuelData,
+        weatherData,
+        tibberData,
+        energyData,
+      ] = await Promise.all([
+        trafficRes.json(),
+        co2Res.json(),
+        newsRes.json(),
+        phoneRes.json(),
+        calendarRes.json(),
+        fuelRes.json(),
+        weatherRes.json(),
+        tibberRes.json(),
+        energyRes.json(),
+      ]);
 
-        const phone = await fetch(
-          process.env.NEXT_PUBLIC_API_URL + "/api/fritz"
-        ).then((res) => res.json());
-
-        const calendar = await fetch(
-          process.env.NEXT_PUBLIC_API_URL + "/api/calendar"
-        ).then((res) => res.json());
-
-        const fuel = await fetch(
-          process.env.NEXT_PUBLIC_API_URL + "/api/fuel"
-        ).then((res) => res.json());
-
-        const weather = await fetch(
-          process.env.NEXT_PUBLIC_API_URL + "/api/weather"
-        ).then((res) => res.json());
-
-        const tibber = await fetch(
-          process.env.NEXT_PUBLIC_API_URL + "/api/tibber"
-        ).then((res) => res.json());
-
-        const energy = await fetch(
-          process.env.NEXT_PUBLIC_API_URL + "/api/alphaess"
-        ).then((res) => res.json());
-
-        // Pass data to the page via props
-
-        const lastUpdate = new Date().toLocaleTimeString();
-
-        setDashboardState({
-          traffic: traffic,
-          co2: co2,
-          news: news,
-          phone: phone,
-          calendar: calendar,
-          fuel: fuel,
-          weather: weather,
-          tibber: tibber,
-          energy: energy,
-          lastUpdate: lastUpdate,
-        });
-      } catch (error) {
-        console.error("Error fetching data:", error);
-        setDashboardState({
-          ...dashboardState,
-          lastUpdate: lastUpdate + " - API Fehler",
-        });
-      }
-    };
-
-    console.log("Energy Index", energy);
-
-    const interval = setInterval(refreshAPI, 5000); // 30000 milliseconds = 30 seconds
+      setDashboardState({
+        traffic: trafficData,
+        co2: co2Data,
+        news: newsData,
+        phone: phoneData,
+        calendar: calendarData,
+        fuel: fuelData,
+        weather: weatherData,
+        tibber: tibberData,
+        energy: energyData,
+        lastUpdate: new Date().toLocaleTimeString(),
+      });
+    } catch (error) {
+      console.error("Error fetching data:", error);
+      setDashboardState((prev) => ({
+        ...prev,
+        lastUpdate: `${new Date().toLocaleTimeString()} - API Fehler`,
+      }));
+    }
   }, []);
 
-  // Cleanup the interval on component unmount
+  useEffect(() => {
+    const interval = setInterval(refreshAPI, 30000); // 30 seconds
+
+    // Cleanup interval on component unmount
+    return () => clearInterval(interval);
+  }, [refreshAPI]);
 
   return (
     <ThemeProvider theme={darkTheme}>
       <CssBaseline />
 
-      <Grid
-        container
-        direction="column"
-        justifyContent="space-around"
-        alignItems="stretch"
-      >
-        {" "}
+      {/* Main container - vertical stack */}
+      <Grid container direction="column" spacing={0.5} sx={{ p: 1 }}>
+        {/* Top row - info cards */}
         <Grid
           container
-          item
-          direction="row"
+          spacing={1}
           justifyContent="space-around"
           alignItems="stretch"
         >
-          <Grid item sx={{ mx: 1, my: 0.2 }}>
+          <Grid>
             <TrafficCard traffic={dashboardState.traffic} />
           </Grid>
-          <Grid item sx={{ mx: 1, my: 0.2 }}>
+          <Grid>
             <CO2SignalCard co2={dashboardState.co2} />
           </Grid>
-          <Grid item sx={{ mx: 1, my: 0.2 }}>
+          <Grid>
             <EnergyCard energy={dashboardState.energy} />
           </Grid>
-          <Grid item sx={{ mx: 1, my: 0.2 }}>
+          <Grid>
             <WeatherCard weather={dashboardState.weather} />
           </Grid>
-          <Grid item sx={{ mx: 1, my: 0.2 }}>
+          <Grid>
             <TibberCard tibber={dashboardState.tibber} />
           </Grid>
-          <Grid item sx={{ mx: 1 }}>
+          <Grid>
             <FuelCard fuel={dashboardState.fuel} />
           </Grid>
         </Grid>
+
+        {/* Middle row - news */}
         <Grid
           container
-          item
-          direction="row"
+          spacing={1}
           justifyContent="space-around"
           alignItems="center"
         >
-          <Grid item sx={{ m: 1, my: 0.2, width: "100%" }}>
+          <Grid size={12}>
             <NewsCard
               news={dashboardState.news}
               lastUpdate={dashboardState.lastUpdate}
             />
           </Grid>
         </Grid>
+
+        {/* Bottom row - phone and calendar */}
         <Grid
           container
-          item
-          direction="row"
+          spacing={1}
           justifyContent="space-around"
           alignItems="center"
         >
-          <Grid item sx={{ mx: 1, my: 0.2 }}>
+          <Grid>
             <PhoneCard phone={dashboardState.phone} />
           </Grid>
-          <Grid item sx={{ mx: 1, my: 0.2 }}>
+          <Grid>
             <CalendarCard calendar={dashboardState.calendar} />
           </Grid>
         </Grid>
@@ -201,67 +233,75 @@ export default function Home({
 }
 
 export const getServerSideProps = async () => {
-  const trafficresponse = await fetch(
-    process.env.NEXT_PUBLIC_API_URL + "/api/traffic"
-  );
-  const traffic = await trafficresponse.json();
+  const apiUrl = process.env.NEXT_PUBLIC_API_URL;
 
-  const co2response = await fetch(
-    process.env.NEXT_PUBLIC_API_URL + "/api/co2signal"
-  );
-  const co2 = await co2response.json();
+  try {
+    const [
+      trafficRes,
+      co2Res,
+      newsRes,
+      phoneRes,
+      calendarRes,
+      fuelRes,
+      weatherRes,
+      tibberRes,
+      energyRes,
+    ] = await Promise.all([
+      fetch(`${apiUrl}/api/traffic`),
+      fetch(`${apiUrl}/api/co2signal`),
+      fetch(`${apiUrl}/api/spiegelfeed`),
+      fetch(`${apiUrl}/api/fritz`),
+      fetch(`${apiUrl}/api/calendar`),
+      fetch(`${apiUrl}/api/fuel`),
+      fetch(`${apiUrl}/api/weather`),
+      fetch(`${apiUrl}/api/tibber`),
+      fetch(`${apiUrl}/api/alphaess`),
+    ]);
 
-  const newsresponse = await fetch(
-    process.env.NEXT_PUBLIC_API_URL + "/api/spiegelfeed"
-  );
-  const news = await newsresponse.json();
+    const [traffic, co2, news, phone, calendar, fuel, weather, tibber, energy] =
+      await Promise.all([
+        trafficRes.json(),
+        co2Res.json(),
+        newsRes.json(),
+        phoneRes.json(),
+        calendarRes.json(),
+        fuelRes.json(),
+        weatherRes.json(),
+        tibberRes.json(),
+        energyRes.json(),
+      ]);
 
-  const phoneresponse = await fetch(
-    process.env.NEXT_PUBLIC_API_URL + "/api/fritz"
-  );
-  const phone = await phoneresponse.json();
-  //console.log("Got phone", phone);
+    return {
+      props: {
+        traffic,
+        co2,
+        news,
+        phone,
+        calendar,
+        fuel,
+        weather,
+        tibber,
+        energy,
+        lastUpdate: new Date().toLocaleTimeString(),
+      },
+    };
+  } catch (error) {
+    console.error("Error in getServerSideProps:", error);
 
-  const calendarresponse = await fetch(
-    process.env.NEXT_PUBLIC_API_URL + "/api/calendar"
-  );
-  const calendar = await calendarresponse.json();
-
-  const fuelresponse = await fetch(
-    process.env.NEXT_PUBLIC_API_URL + "/api/fuel"
-  );
-  const fuel = await fuelresponse.json();
-
-  const weatherresponse = await fetch(
-    process.env.NEXT_PUBLIC_API_URL + "/api/weather"
-  );
-  const weather = await weatherresponse.json();
-
-  const tibberresponse = await fetch(
-    process.env.NEXT_PUBLIC_API_URL + "/api/tibber"
-  );
-  const tibber = await tibberresponse.json();
-
-  const energyresponse = await fetch(
-    process.env.NEXT_PUBLIC_API_URL + "/api/alphaess"
-  );
-  const energy = await energyresponse.json();
-  console.log("Energy api", energy);
-  const lastUpdate = new Date().toLocaleTimeString();
-
-  // Pass data to the page via props
-  return {
-    props: {
-      traffic,
-      co2,
-      news,
-      phone,
-      calendar,
-      fuel,
-      weather,
-      tibber,
-      energy,
-      lastUpdate,
-    },
-  };
+    // Return empty/default props on error
+    return {
+      props: {
+        traffic: null,
+        co2: null,
+        news: null,
+        phone: null,
+        calendar: null,
+        fuel: null,
+        weather: null,
+        tibber: null,
+        energy: null,
+        lastUpdate: `${new Date().toLocaleTimeString()} - Initial load error`,
+      },
+    };
+  }
 };
