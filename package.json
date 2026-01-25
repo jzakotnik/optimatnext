@@ -14,7 +14,7 @@
     "@mui/icons-material": "^7.3.7",
     "@mui/material": "^7.3.7",
     "dayjs": "^1.11.19",
-    "fritzbox": "^1.1.4",
+    "fritzbox": "^1.1.1",
     "fritzbox.js": "^2.0.1",
     "googleapis": "^170.1.0",
     "lowdb": "^7.0.1",

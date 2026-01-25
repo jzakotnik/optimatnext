@@ -2,7 +2,7 @@ import { ThemeProvider, createTheme } from "@mui/material/styles";
 import CssBaseline from "@mui/material/CssBaseline";
 import Grid from "@mui/material/Grid"; // MUI v7 uses Grid2 as the default Grid
 import TrafficCard from "@/components/TrafficCard";
-import CO2SignalCard from "@/components/CO2SignalCard";
+import ElectricityMapsCard from "@/components/ElectricityMapsCard";
 import NewsCard from "@/components/NewsCard";
 import PhoneCard from "@/components/PhoneCard";
 import CalendarCard from "@/components/CalendarCard";
@@ -19,7 +19,6 @@ const darkTheme = createTheme({
 });
 
 // Define types for API responses
-// TODO: Replace these with actual API response types for full type safety
 interface EnergyData {
   energy: {
     data: {
@@ -30,17 +29,20 @@ interface EnergyData {
   };
 }
 
-interface CO2Data {
+interface ElectricityMapsData {
   items?: {
-    data?: {
-      fossilFuelPercentage: number | string;
-    };
+    zone: string;
+    carbonIntensity: number;
+    datetime: string;
+    updatedAt: string;
+    isEstimated: boolean;
+    countryCode: string;
   };
 }
 
 interface DashboardState {
   traffic: Record<string, unknown> | null;
-  co2: CO2Data | null;
+  electricitymaps: ElectricityMapsData | null;
   news: Record<string, unknown> | null;
   phone: Record<string, unknown> | null;
   calendar: Record<string, unknown> | null;
@@ -53,7 +55,7 @@ interface DashboardState {
 
 interface IndexPageProps {
   traffic: Record<string, unknown> | null;
-  co2: CO2Data | null;
+  electricitymaps: ElectricityMapsData | null;
   news: Record<string, unknown> | null;
   phone: Record<string, unknown> | null;
   calendar: Record<string, unknown> | null;
@@ -66,7 +68,7 @@ interface IndexPageProps {
 
 export default function Home({
   traffic,
-  co2,
+  electricitymaps,
   news,
   phone,
   calendar,
@@ -78,7 +80,7 @@ export default function Home({
 }: IndexPageProps) {
   const [dashboardState, setDashboardState] = useState<DashboardState>({
     traffic,
-    co2,
+    electricitymaps,
     news,
     phone,
     calendar,
@@ -95,7 +97,7 @@ export default function Home({
     try {
       const [
         trafficRes,
-        co2Res,
+        electricitymapsRes,
         newsRes,
         phoneRes,
         calendarRes,
@@ -105,7 +107,7 @@ export default function Home({
         energyRes,
       ] = await Promise.all([
         fetch(`${apiUrl}/api/traffic`),
-        fetch(`${apiUrl}/api/co2signal`),
+        fetch(`${apiUrl}/api/electricitymaps`),
         fetch(`${apiUrl}/api/spiegelfeed`),
         fetch(`${apiUrl}/api/fritz`),
         fetch(`${apiUrl}/api/calendar`),
@@ -117,7 +119,7 @@ export default function Home({
 
       const [
         trafficData,
-        co2Data,
+        electricitymapsData,
         newsData,
         phoneData,
         calendarData,
@@ -127,7 +129,7 @@ export default function Home({
         energyData,
       ] = await Promise.all([
         trafficRes.json(),
-        co2Res.json(),
+        electricitymapsRes.json(),
         newsRes.json(),
         phoneRes.json(),
         calendarRes.json(),
@@ -139,7 +141,7 @@ export default function Home({
 
       setDashboardState({
         traffic: trafficData,
-        co2: co2Data,
+        electricitymaps: electricitymapsData,
         news: newsData,
         phone: phoneData,
         calendar: calendarData,
@@ -182,7 +184,7 @@ export default function Home({
             <TrafficCard traffic={dashboardState.traffic} />
           </Grid>
           <Grid>
-            <CO2SignalCard co2={dashboardState.co2} />
+            <ElectricityMapsCard data={dashboardState.electricitymaps} />
           </Grid>
           <Grid>
             <EnergyCard energy={dashboardState.energy} />
@@ -238,7 +240,7 @@ export const getServerSideProps = async () => {
   try {
     const [
       trafficRes,
-      co2Res,
+      electricitymapsRes,
       newsRes,
       phoneRes,
       calendarRes,
@@ -248,7 +250,7 @@ export const getServerSideProps = async () => {
       energyRes,
     ] = await Promise.all([
       fetch(`${apiUrl}/api/traffic`),
-      fetch(`${apiUrl}/api/co2signal`),
+      fetch(`${apiUrl}/api/electricitymaps`),
       fetch(`${apiUrl}/api/spiegelfeed`),
       fetch(`${apiUrl}/api/fritz`),
       fetch(`${apiUrl}/api/calendar`),
@@ -258,23 +260,32 @@ export const getServerSideProps = async () => {
       fetch(`${apiUrl}/api/alphaess`),
     ]);
 
-    const [traffic, co2, news, phone, calendar, fuel, weather, tibber, energy] =
-      await Promise.all([
-        trafficRes.json(),
-        co2Res.json(),
-        newsRes.json(),
-        phoneRes.json(),
-        calendarRes.json(),
-        fuelRes.json(),
-        weatherRes.json(),
-        tibberRes.json(),
-        energyRes.json(),
-      ]);
+    const [
+      traffic,
+      electricitymaps,
+      news,
+      phone,
+      calendar,
+      fuel,
+      weather,
+      tibber,
+      energy,
+    ] = await Promise.all([
+      trafficRes.json(),
+      electricitymapsRes.json(),
+      newsRes.json(),
+      phoneRes.json(),
+      calendarRes.json(),
+      fuelRes.json(),
+      weatherRes.json(),
+      tibberRes.json(),
+      energyRes.json(),
+    ]);
 
     return {
       props: {
         traffic,
-        co2,
+        electricitymaps,
         news,
         phone,
         calendar,
@@ -292,7 +303,7 @@ export const getServerSideProps = async () => {
     return {
       props: {
         traffic: null,
-        co2: null,
+        electricitymaps: null,
         news: null,
         phone: null,
         calendar: null,
