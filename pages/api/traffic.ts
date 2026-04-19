@@ -1,5 +1,5 @@
 import type { NextApiRequest, NextApiResponse } from "next";
-import { readKey, writeKey } from "../../utils/dbutils";
+import { readKey, writeKey, assertJsonResponse, safeParsePayload } from "../../utils/dbutils";
 
 const url = process.env.GOOGLETRAFFIC_URL as string;
 const apikey = process.env.GOOGLE_API_KEY as string;
@@ -14,30 +14,29 @@ export default async function handler(
   res: NextApiResponse
 ) {
   const cachedData = await readKey("traffic");
-  //console.log("Cached Data last Update", cachedData.age);
   const cacheSeconds = cachedData.age;
   try {
     if (isNaN(cacheSeconds) || cacheSeconds > parseInt(TRAFFIC_CACHE_SECONDS)) {
       console.log("Refreshing Cache for Traffic");
-      const traffic = await fetch(requestURL);
-      const data = await traffic.json();
+      const response = await fetch(requestURL);
+      await assertJsonResponse(response, "GoogleTraffic");
+      const data = await response.json();
       const convertedDuration = data.rows[0].elements[0].duration_in_traffic
-        .value as number; //duration in seconds
+        .value as number;
       const durationMinutes = Math.round(convertedDuration / 60);
       await writeKey("traffic", durationMinutes as any);
       res.status(200).json({ key: "traffic", items: durationMinutes });
     } else {
-      //console.log("Used cache for traffic");
       res.status(200).json({
         key: "traffic",
-        items: JSON.parse(cachedData.data.payload),
+        items: safeParsePayload(cachedData.data.payload, null),
       });
     }
   } catch (e: any) {
-    console.warn("Cache refresh for traffic went wrong", e);
+    console.warn("Cache refresh for traffic went wrong:", e.message);
     res.status(200).json({
       key: "traffic",
-      items: JSON.parse(cachedData.data.payload),
+      items: safeParsePayload(cachedData.data.payload, null),
     });
   }
 }

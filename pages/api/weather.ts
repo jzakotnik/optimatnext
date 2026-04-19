@@ -1,5 +1,5 @@
 import type { NextApiRequest, NextApiResponse } from "next";
-import { readKey, writeKey } from "../../utils/dbutils";
+import { readKey, writeKey, assertJsonResponse, safeParsePayload } from "../../utils/dbutils";
 
 const url = process.env.OPENWEATHER_URL as string;
 const apikey = process.env.OPENWEATHER_APIKEY as string;
@@ -13,29 +13,27 @@ export default async function handler(
   res: NextApiResponse
 ) {
   const cachedData = await readKey("weather");
-  //console.log("Cached Data last Update", cachedData.age);
   const cacheSeconds = cachedData.age;
   try {
     if (isNaN(cacheSeconds) || cacheSeconds > parseInt(WEATHER_CACHE_SECONDS)) {
       console.log("Refreshing Cache for Weather");
       const weather = await fetch(requestURL);
+      await assertJsonResponse(weather, "OpenWeather");
       const data = await weather.json();
       const singleData = data.main.temp;
       await writeKey("weather", singleData as any);
-
       res.status(200).json({ key: "weather", items: singleData });
     } else {
-      //console.log("Used cache for weather");
       res.status(200).json({
         key: "weather",
-        items: JSON.parse(cachedData.data.payload),
+        items: safeParsePayload(cachedData.data.payload, null),
       });
     }
   } catch (e: any) {
-    console.warn("Cache refresh for weather went wrong", e);
+    console.warn("Cache refresh for weather went wrong:", e.message);
     res.status(200).json({
       key: "weather",
-      items: JSON.parse(cachedData.data.payload),
+      items: safeParsePayload(cachedData.data.payload, null),
     });
   }
 }

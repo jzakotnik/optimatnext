@@ -1,5 +1,5 @@
 import type { NextApiRequest, NextApiResponse } from "next";
-import { writeKey, readKey } from "../../utils/dbutils";
+import { writeKey, readKey, safeParsePayload } from "../../utils/dbutils";
 const fritz = require("fritzbox.js");
 
 const FRITZ_USER = process.env.FRITZ_USER as string;
@@ -18,34 +18,28 @@ export default async function handler(
   req: NextApiRequest,
   res: NextApiResponse
 ) {
-  //check if cache hit is sufficient
   const cachedData = await readKey("fritz");
-  //console.log("Cached Data last Update", cachedData.age);
   const cacheSeconds = cachedData.age;
 
   if (isNaN(cacheSeconds) || cacheSeconds > parseInt(FRITZ_CACHE_SECONDS)) {
     console.log("Refreshing Cache for Fritz");
-
     try {
-      console.log("Getting fritz.getCalls now..");
       const calls = await fritz.getCalls(options);
-      if (calls.error) return console.log("Error: " + calls.error.message);
-      console.log("Got " + calls.length + "calls.");
-      console.log("Calls", calls);
+      if (calls.error) {
+        throw new Error("Fritz error: " + calls.error.message);
+      }
       const missedCalls = calls.filter((c: any) => c.type === "missed");
       await writeKey("fritz", missedCalls);
-
       res.status(200).json({ key: "fritz", items: missedCalls.slice(0, 10) });
     } catch (e: any) {
-      console.warn("Cache refresh for phone data went wrong", e);
-      res.status(200).json({ key: "fritz", items: {} });
+      console.warn("Cache refresh for phone data went wrong:", e.message);
+      res.status(200).json({
+        key: "fritz",
+        items: safeParsePayload<any[]>(cachedData.data.payload, []),
+      });
     }
-  } //this is a cache hit
-  else {
-    //console.log("Used cache for phone data", cachedData.data.payload);
-    res.status(200).json({
-      key: "fritz",
-      items: JSON.parse(cachedData.data.payload).slice(0, 10),
-    });
+  } else {
+    const parsed = safeParsePayload<any[]>(cachedData.data.payload, []);
+    res.status(200).json({ key: "fritz", items: parsed.slice(0, 10) });
   }
 }
