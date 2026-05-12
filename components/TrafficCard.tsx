@@ -19,6 +19,7 @@ const headerSX = {
 
 export default function TrafficCard({ traffic }: TrafficCardProps) {
   const theme = useTheme();
+  const duration = traffic?.items ?? null;
   console.log("Rendering traffic", new Date().toLocaleString(), traffic);
   return (
     <Card
@@ -40,7 +41,7 @@ export default function TrafficCard({ traffic }: TrafficCardProps) {
       <CardHeader
         title={
           <Typography variant="h5" sx={{ fontWeight: "bold" }}>
-            {traffic.items + " Min"}
+            {duration === null ? "" : traffic.items + " Min"}
           </Typography>
         }
         avatar={
