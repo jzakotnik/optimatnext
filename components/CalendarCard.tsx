@@ -74,7 +74,7 @@ export default function CalendarCard({ calendar }: CalendarCardProps) {
         <CardContent>
           {formattedCalendar.slice(0, 5).map((n: any, i: number) => (
             <Typography variant="h5" sx={{ fontWeight: "bold" }} key={i}>
-              {n}
+              {n === null ? "" : n}
             </Typography>
           ))}
         </CardContent>

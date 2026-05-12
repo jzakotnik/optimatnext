@@ -46,7 +46,7 @@ export default function WeatherCard({ weather }: WeatherCardProps) {
       <CardHeader
         title={
           <Typography variant="h5" sx={{ fontWeight: "bold" }}>
-            {temperature + " °C"}
+            {temperature === null ? "" : temperature + " °C"}
           </Typography>
         }
         avatar={
