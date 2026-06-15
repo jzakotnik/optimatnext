@@ -16,9 +16,18 @@ const options = {
 
 export default async function handler(
   req: NextApiRequest,
-  res: NextApiResponse
+  res: NextApiResponse,
 ) {
-  const cachedData = await readKey("fritz");
+  let cachedData: Awaited<ReturnType<typeof readKey>> | undefined;
+
+  try {
+    cachedData = await readKey("fritz");
+  } catch (e: any) {
+    console.warn("Fritz cache read failed:", e.message);
+    // Can't read cache at all — return empty safe response
+    return res.status(200).json({ key: "fritz", items: [] });
+  }
+
   const cacheSeconds = cachedData.age;
 
   if (isNaN(cacheSeconds) || cacheSeconds > parseInt(FRITZ_CACHE_SECONDS)) {
@@ -33,6 +42,7 @@ export default async function handler(
       res.status(200).json({ key: "fritz", items: missedCalls.slice(0, 10) });
     } catch (e: any) {
       console.warn("Cache refresh for phone data went wrong:", e.message);
+      // cachedData is guaranteed defined here now
       res.status(200).json({
         key: "fritz",
         items: safeParsePayload<any[]>(cachedData.data.payload, []),
