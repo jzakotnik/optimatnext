@@ -27,35 +27,88 @@ function truncateMarkdown(markdown: string, maxChars: number): string {
 }
 
 function getMarkdownComponents(fullscreen: boolean) {
-  const headerVariant = fullscreen ? "h2" : "h4";
-  const bodyVariant = fullscreen ? "h3" : "h5";
+  if (fullscreen) {
+    return {
+      h1: ({ children }: any) => (
+        <Typography
+          sx={{ fontWeight: "bold", fontSize: "5rem", lineHeight: 1.15, mb: 3 }}
+        >
+          {children}
+        </Typography>
+      ),
+      h2: ({ children }: any) => (
+        <Typography
+          sx={{
+            fontWeight: "bold",
+            fontSize: "3.5rem",
+            lineHeight: 1.2,
+            mb: 3,
+          }}
+        >
+          {children}
+        </Typography>
+      ),
+      h3: ({ children }: any) => (
+        <Typography
+          sx={{
+            fontWeight: "bold",
+            fontSize: "3.5rem",
+            lineHeight: 1.2,
+            mb: 3,
+          }}
+        >
+          {children}
+        </Typography>
+      ),
+      p: ({ children }: any) => (
+        <Typography
+          sx={{ fontWeight: "bold", fontSize: "3rem", lineHeight: 1.3, mb: 3 }}
+        >
+          {children}
+        </Typography>
+      ),
+      li: ({ children }: any) => (
+        <Typography
+          component="li"
+          sx={{ fontWeight: "bold", fontSize: "3rem", lineHeight: 1.3, mb: 2 }}
+        >
+          {children}
+        </Typography>
+      ),
+      strong: ({ children }: any) => (
+        <Typography component="span" sx={{ fontWeight: "bold" }}>
+          {children}
+        </Typography>
+      ),
+    };
+  }
 
   return {
     h1: ({ children }: any) => (
-      <Typography variant={headerVariant} sx={{ fontWeight: "bold", mb: 2 }}>
+      <Typography variant="h4" sx={{ fontWeight: "bold", mb: 1 }}>
         {children}
       </Typography>
     ),
     h2: ({ children }: any) => (
-      <Typography variant={bodyVariant} sx={{ fontWeight: "bold", mb: 2 }}>
+      <Typography variant="h5" sx={{ fontWeight: "bold", mb: 1 }}>
         {children}
       </Typography>
     ),
     h3: ({ children }: any) => (
-      <Typography variant={bodyVariant} sx={{ fontWeight: "bold", mb: 2 }}>
+      <Typography variant="h5" sx={{ fontWeight: "bold", mb: 1 }}>
         {children}
       </Typography>
     ),
     p: ({ children }: any) => (
-      <Typography variant={bodyVariant} sx={{ fontWeight: "bold", mb: 2 }}>
+      <Typography variant="h5" sx={{ fontWeight: "bold", mb: 1 }}>
         {children}
       </Typography>
     ),
     li: ({ children }: any) => (
       <Typography
         component="li"
-        variant={bodyVariant}
-        sx={{ fontWeight: "bold", mb: 1 }}
+        variant="h5"
+        sx={{ fontWeight: "bold", mb: 0.5 }}
       >
         {children}
       </Typography>
@@ -102,8 +155,14 @@ export default function N8nCard({ n8n, fullscreen = false }: N8nCardProps) {
       }}
     >
       <CardHeader
+        sx={fullscreen ? { p: 1.5 } : undefined}
         title={
-          <Typography variant="h5" sx={{ fontWeight: "bold" }}>
+          <Typography
+            sx={{
+              fontWeight: "bold",
+              fontSize: fullscreen ? "1.75rem" : "1.25rem",
+            }}
+          >
             n8n
           </Typography>
         }
@@ -115,11 +174,11 @@ export default function N8nCard({ n8n, fullscreen = false }: N8nCardProps) {
       />
       <CardContent
         sx={{
-          maxHeight: fullscreen ? "calc(100vh - 140px)" : 220,
+          maxHeight: fullscreen ? "calc(100vh - 110px)" : 220,
           overflow: "hidden",
           wordBreak: "break-word",
           overflowWrap: "anywhere",
-          "& ul, & ol": { m: 0, mb: 1, pl: 3 },
+          "& ul, & ol": { m: 0, mb: 2, pl: 4 },
           color: "inherit",
         }}
       >
