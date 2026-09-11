@@ -182,13 +182,13 @@ export default function Home({
     return () => clearInterval(interval);
   }, [refreshAPI]);
 
-  useEffect(() => {
+  /*useEffect(() => {
     const rotateInterval = setInterval(() => {
       setViewMode((prev) => (prev === "dashboard" ? "n8n" : "dashboard"));
     }, 10000); // 10 seconds
 
     return () => clearInterval(rotateInterval);
-  }, []);
+  }, []);*/
 
   return (
     <ThemeProvider theme={darkTheme}>
