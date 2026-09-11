@@ -34,8 +34,7 @@ export default function N8nCard({ n8n }: N8nCardProps) {
       elevation={1}
       sx={{
         height: "100%",
-        width: 360,
-        maxWidth: 360,
+        width: "100%",
         border: "1px solid",
         borderRadius: 2,
         borderColor: "#FFFFF",

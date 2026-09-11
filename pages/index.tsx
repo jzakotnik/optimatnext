@@ -226,6 +226,7 @@ export default function Home({
         </Grid>
 
         {/* Bottom row - n8n and calendar (telephone box parked here, see PhoneCard import) */}
+        {/* Bottom row - n8n and calendar (telephone box parked here, see PhoneCard import) */}
         <Grid
           container
           spacing={1}
@@ -233,11 +234,11 @@ export default function Home({
           alignItems="center"
           sx={{ flexWrap: "nowrap" }}
         >
-          <Grid sx={{ minWidth: 0 }}>
+          <Grid sx={{ flexGrow: 1, minWidth: 0 }}>
             {/* <PhoneCard phone={dashboardState.phone} /> */}
             <N8nCard n8n={dashboardState.n8n} />
           </Grid>
-          <Grid sx={{ minWidth: 0 }}>
+          <Grid sx={{ flexShrink: 0 }}>
             <CalendarCard calendar={dashboardState.calendar} />
           </Grid>
         </Grid>
