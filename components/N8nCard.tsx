@@ -18,6 +18,43 @@ const headerSX = {
   "& .MuiCardHeader-action": { m: "0px auto", alignSelf: "center" },
 };
 
+const markdownComponents = {
+  h1: ({ children }: any) => (
+    <Typography variant="h4" sx={{ fontWeight: "bold", mb: 1 }}>
+      {children}
+    </Typography>
+  ),
+  h2: ({ children }: any) => (
+    <Typography variant="h5" sx={{ fontWeight: "bold", mb: 1 }}>
+      {children}
+    </Typography>
+  ),
+  h3: ({ children }: any) => (
+    <Typography variant="h5" sx={{ fontWeight: "bold", mb: 1 }}>
+      {children}
+    </Typography>
+  ),
+  p: ({ children }: any) => (
+    <Typography variant="h5" sx={{ fontWeight: "bold", mb: 1 }}>
+      {children}
+    </Typography>
+  ),
+  li: ({ children }: any) => (
+    <Typography
+      component="li"
+      variant="h5"
+      sx={{ fontWeight: "bold", mb: 0.5 }}
+    >
+      {children}
+    </Typography>
+  ),
+  strong: ({ children }: any) => (
+    <Typography component="span" sx={{ fontWeight: "bold" }}>
+      {children}
+    </Typography>
+  ),
+};
+
 export default function N8nCard({ n8n }: N8nCardProps) {
   const theme = useTheme();
   console.log("Rendering n8n", new Date().toLocaleString(), n8n);
@@ -65,15 +102,14 @@ export default function N8nCard({ n8n }: N8nCardProps) {
           overflow: "hidden",
           wordBreak: "break-word",
           overflowWrap: "anywhere",
-          "& p": { m: 0, mb: 1 },
           "& ul, & ol": { m: 0, mb: 1, pl: 3 },
-          "& h1, & h2, & h3": { m: 0, mb: 1 },
           color: "inherit",
-          fontFamily: theme.typography.fontFamily,
         }}
       >
         {markdown.length > 0 ? (
-          <ReactMarkdown>{markdown}</ReactMarkdown>
+          <ReactMarkdown components={markdownComponents}>
+            {markdown}
+          </ReactMarkdown>
         ) : (
           <Typography variant="h5" sx={{ fontWeight: "bold" }}>
             -
