@@ -4,7 +4,8 @@ import Grid from "@mui/material/Grid"; // MUI v7 uses Grid2 as the default Grid
 import TrafficCard from "@/components/TrafficCard";
 import ElectricityMapsCard from "@/components/ElectricityMapsCard";
 import NewsCard from "@/components/NewsCard";
-import PhoneCard from "@/components/PhoneCard";
+import PhoneCard from "@/components/PhoneCard"; // eslint-disable-line @typescript-eslint/no-unused-vars
+import N8nCard from "@/components/N8nCard";
 import CalendarCard from "@/components/CalendarCard";
 import FuelCard from "@/components/FuelCard";
 import WeatherCard from "@/components/WeatherCard";
@@ -41,6 +42,7 @@ interface ElectricityMapsData {
 }
 
 interface DashboardState {
+  n8n: Record<string, unknown> | null;
   traffic: Record<string, unknown> | null;
   electricitymaps: ElectricityMapsData | null;
   news: Record<string, unknown> | null;
@@ -54,6 +56,7 @@ interface DashboardState {
 }
 
 interface IndexPageProps {
+  n8n: Record<string, unknown> | null;
   traffic: Record<string, unknown> | null;
   electricitymaps: ElectricityMapsData | null;
   news: Record<string, unknown> | null;
@@ -67,6 +70,7 @@ interface IndexPageProps {
 }
 
 export default function Home({
+  n8n,
   traffic,
   electricitymaps,
   news,
@@ -79,6 +83,7 @@ export default function Home({
   lastUpdate,
 }: IndexPageProps) {
   const [dashboardState, setDashboardState] = useState<DashboardState>({
+    n8n,
     traffic,
     electricitymaps,
     news,
@@ -96,6 +101,7 @@ export default function Home({
 
     try {
       const [
+        n8nRes,
         trafficRes,
         electricitymapsRes,
         newsRes,
@@ -106,6 +112,7 @@ export default function Home({
         tibberRes,
         energyRes,
       ] = await Promise.all([
+        fetch(`${apiUrl}/api/n8n`),
         fetch(`${apiUrl}/api/traffic`),
         fetch(`${apiUrl}/api/electricitymaps`),
         fetch(`${apiUrl}/api/spiegelfeed`),
@@ -118,6 +125,7 @@ export default function Home({
       ]);
 
       const [
+        n8nData,
         trafficData,
         electricitymapsData,
         newsData,
@@ -128,6 +136,7 @@ export default function Home({
         tibberData,
         energyData,
       ] = await Promise.all([
+        n8nRes.json(),
         trafficRes.json(),
         electricitymapsRes.json(),
         newsRes.json(),
@@ -140,6 +149,7 @@ export default function Home({
       ]);
 
       setDashboardState({
+        n8n: n8nData,
         traffic: trafficData,
         electricitymaps: electricitymapsData,
         news: newsData,
@@ -215,7 +225,7 @@ export default function Home({
           </Grid>
         </Grid>
 
-        {/* Bottom row - phone and calendar */}
+        {/* Bottom row - n8n and calendar (telephone box parked here, see PhoneCard import) */}
         <Grid
           container
           spacing={1}
@@ -223,7 +233,8 @@ export default function Home({
           alignItems="center"
         >
           <Grid>
-            <PhoneCard phone={dashboardState.phone} />
+            {/* <PhoneCard phone={dashboardState.phone} /> */}
+            <N8nCard n8n={dashboardState.n8n} />
           </Grid>
           <Grid>
             <CalendarCard calendar={dashboardState.calendar} />
@@ -239,6 +250,7 @@ export const getServerSideProps = async () => {
 
   try {
     const [
+      n8nRes,
       trafficRes,
       electricitymapsRes,
       newsRes,
@@ -249,6 +261,7 @@ export const getServerSideProps = async () => {
       tibberRes,
       energyRes,
     ] = await Promise.all([
+      fetch(`${apiUrl}/api/n8n`),
       fetch(`${apiUrl}/api/traffic`),
       fetch(`${apiUrl}/api/electricitymaps`),
       fetch(`${apiUrl}/api/spiegelfeed`),
@@ -261,6 +274,7 @@ export const getServerSideProps = async () => {
     ]);
 
     const [
+      n8n,
       traffic,
       electricitymaps,
       news,
@@ -271,6 +285,7 @@ export const getServerSideProps = async () => {
       tibber,
       energy,
     ] = await Promise.all([
+      n8nRes.json(),
       trafficRes.json(),
       electricitymapsRes.json(),
       newsRes.json(),
@@ -284,6 +299,7 @@ export const getServerSideProps = async () => {
 
     return {
       props: {
+        n8n,
         traffic,
         electricitymaps,
         news,
@@ -302,6 +318,7 @@ export const getServerSideProps = async () => {
     // Return empty/default props on error
     return {
       props: {
+        n8n: null,
         traffic: null,
         electricitymaps: null,
         news: null,
