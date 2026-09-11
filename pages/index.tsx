@@ -231,12 +231,13 @@ export default function Home({
           spacing={1}
           justifyContent="space-around"
           alignItems="center"
+          sx={{ flexWrap: "nowrap" }}
         >
-          <Grid>
+          <Grid sx={{ minWidth: 0 }}>
             {/* <PhoneCard phone={dashboardState.phone} /> */}
             <N8nCard n8n={dashboardState.n8n} />
           </Grid>
-          <Grid>
+          <Grid sx={{ minWidth: 0 }}>
             <CalendarCard calendar={dashboardState.calendar} />
           </Grid>
         </Grid>

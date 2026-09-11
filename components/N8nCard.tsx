@@ -34,6 +34,8 @@ export default function N8nCard({ n8n }: N8nCardProps) {
       elevation={1}
       sx={{
         height: "100%",
+        width: 360,
+        maxWidth: 360,
         border: "1px solid",
         borderRadius: 2,
         borderColor: "#FFFFF",
@@ -60,6 +62,10 @@ export default function N8nCard({ n8n }: N8nCardProps) {
       />
       <CardContent
         sx={{
+          maxHeight: 220,
+          overflow: "hidden",
+          wordBreak: "break-word",
+          overflowWrap: "anywhere",
           "& p": { m: 0, mb: 1 },
           "& ul, & ol": { m: 0, mb: 1, pl: 3 },
           "& h1, & h2, & h3": { m: 0, mb: 1 },
