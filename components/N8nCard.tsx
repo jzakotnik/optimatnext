@@ -11,6 +11,7 @@ import ReactMarkdown from "react-markdown";
 
 type N8nCardProps = {
   n8n: any;
+  fullscreen?: boolean;
 };
 
 const headerSX = {
@@ -18,44 +19,56 @@ const headerSX = {
   "& .MuiCardHeader-action": { m: "0px auto", alignSelf: "center" },
 };
 
-const markdownComponents = {
-  h1: ({ children }: any) => (
-    <Typography variant="h4" sx={{ fontWeight: "bold", mb: 1 }}>
-      {children}
-    </Typography>
-  ),
-  h2: ({ children }: any) => (
-    <Typography variant="h5" sx={{ fontWeight: "bold", mb: 1 }}>
-      {children}
-    </Typography>
-  ),
-  h3: ({ children }: any) => (
-    <Typography variant="h5" sx={{ fontWeight: "bold", mb: 1 }}>
-      {children}
-    </Typography>
-  ),
-  p: ({ children }: any) => (
-    <Typography variant="h5" sx={{ fontWeight: "bold", mb: 1 }}>
-      {children}
-    </Typography>
-  ),
-  li: ({ children }: any) => (
-    <Typography
-      component="li"
-      variant="h5"
-      sx={{ fontWeight: "bold", mb: 0.5 }}
-    >
-      {children}
-    </Typography>
-  ),
-  strong: ({ children }: any) => (
-    <Typography component="span" sx={{ fontWeight: "bold" }}>
-      {children}
-    </Typography>
-  ),
-};
+const BOX_MAX_CHARS = 800;
 
-export default function N8nCard({ n8n }: N8nCardProps) {
+function truncateMarkdown(markdown: string, maxChars: number): string {
+  if (markdown.length <= maxChars) return markdown;
+  return markdown.slice(0, maxChars).trimEnd() + "…";
+}
+
+function getMarkdownComponents(fullscreen: boolean) {
+  const headerVariant = fullscreen ? "h2" : "h4";
+  const bodyVariant = fullscreen ? "h3" : "h5";
+
+  return {
+    h1: ({ children }: any) => (
+      <Typography variant={headerVariant} sx={{ fontWeight: "bold", mb: 2 }}>
+        {children}
+      </Typography>
+    ),
+    h2: ({ children }: any) => (
+      <Typography variant={bodyVariant} sx={{ fontWeight: "bold", mb: 2 }}>
+        {children}
+      </Typography>
+    ),
+    h3: ({ children }: any) => (
+      <Typography variant={bodyVariant} sx={{ fontWeight: "bold", mb: 2 }}>
+        {children}
+      </Typography>
+    ),
+    p: ({ children }: any) => (
+      <Typography variant={bodyVariant} sx={{ fontWeight: "bold", mb: 2 }}>
+        {children}
+      </Typography>
+    ),
+    li: ({ children }: any) => (
+      <Typography
+        component="li"
+        variant={bodyVariant}
+        sx={{ fontWeight: "bold", mb: 1 }}
+      >
+        {children}
+      </Typography>
+    ),
+    strong: ({ children }: any) => (
+      <Typography component="span" sx={{ fontWeight: "bold" }}>
+        {children}
+      </Typography>
+    ),
+  };
+}
+
+export default function N8nCard({ n8n, fullscreen = false }: N8nCardProps) {
   const theme = useTheme();
   console.log("Rendering n8n", new Date().toLocaleString(), n8n);
 
@@ -65,6 +78,10 @@ export default function N8nCard({ n8n }: N8nCardProps) {
   } catch (e: any) {
     console.log("ERROR reading n8n markdown", n8n);
   }
+
+  const displayMarkdown = fullscreen
+    ? markdown
+    : truncateMarkdown(markdown, BOX_MAX_CHARS);
 
   return (
     <Card
@@ -98,7 +115,7 @@ export default function N8nCard({ n8n }: N8nCardProps) {
       />
       <CardContent
         sx={{
-          maxHeight: 220,
+          maxHeight: fullscreen ? "calc(100vh - 140px)" : 220,
           overflow: "hidden",
           wordBreak: "break-word",
           overflowWrap: "anywhere",
@@ -106,9 +123,9 @@ export default function N8nCard({ n8n }: N8nCardProps) {
           color: "inherit",
         }}
       >
-        {markdown.length > 0 ? (
-          <ReactMarkdown components={markdownComponents}>
-            {markdown}
+        {displayMarkdown.length > 0 ? (
+          <ReactMarkdown components={getMarkdownComponents(fullscreen)}>
+            {displayMarkdown}
           </ReactMarkdown>
         ) : (
           <Typography variant="h5" sx={{ fontWeight: "bold" }}>

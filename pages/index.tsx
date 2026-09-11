@@ -12,6 +12,7 @@ import WeatherCard from "@/components/WeatherCard";
 import TibberCard from "@/components/TibberCard";
 import EnergyCard from "@/components/EnergyCard";
 import { useEffect, useState, useCallback } from "react";
+import Box from "@mui/material/Box";
 
 const darkTheme = createTheme({
   palette: {
@@ -69,6 +70,8 @@ interface IndexPageProps {
   lastUpdate: string;
 }
 
+type ViewMode = "dashboard" | "n8n";
+
 export default function Home({
   n8n,
   traffic,
@@ -95,6 +98,8 @@ export default function Home({
     energy,
     lastUpdate,
   });
+
+  const [viewMode, setViewMode] = useState<ViewMode>("dashboard");
 
   const refreshAPI = useCallback(async () => {
     const apiUrl = process.env.NEXT_PUBLIC_API_URL;
@@ -177,72 +182,84 @@ export default function Home({
     return () => clearInterval(interval);
   }, [refreshAPI]);
 
+  useEffect(() => {
+    const rotateInterval = setInterval(() => {
+      setViewMode((prev) => (prev === "dashboard" ? "n8n" : "dashboard"));
+    }, 10000); // 10 seconds
+
+    return () => clearInterval(rotateInterval);
+  }, []);
+
   return (
     <ThemeProvider theme={darkTheme}>
       <CssBaseline />
 
-      {/* Main container - vertical stack */}
-      <Grid container direction="column" spacing={0.5} sx={{ p: 1 }}>
-        {/* Top row - info cards */}
-        <Grid
-          container
-          spacing={1}
-          justifyContent="space-around"
-          alignItems="stretch"
-        >
-          <Grid>
-            <TrafficCard traffic={dashboardState.traffic} />
+      {viewMode === "n8n" ? (
+        <Box sx={{ height: "100vh", p: 2 }}>
+          <N8nCard n8n={dashboardState.n8n} fullscreen />
+        </Box>
+      ) : (
+        <Grid container direction="column" spacing={0.5} sx={{ p: 1 }}>
+          {/* Top row - info cards */}
+          <Grid
+            container
+            spacing={1}
+            justifyContent="space-around"
+            alignItems="stretch"
+          >
+            <Grid>
+              <TrafficCard traffic={dashboardState.traffic} />
+            </Grid>
+            <Grid>
+              <ElectricityMapsCard data={dashboardState.electricitymaps} />
+            </Grid>
+            <Grid>
+              <EnergyCard energy={dashboardState.energy} />
+            </Grid>
+            <Grid>
+              <WeatherCard weather={dashboardState.weather} />
+            </Grid>
+            <Grid>
+              <TibberCard tibber={dashboardState.tibber} />
+            </Grid>
+            <Grid>
+              <FuelCard fuel={dashboardState.fuel} />
+            </Grid>
           </Grid>
-          <Grid>
-            <ElectricityMapsCard data={dashboardState.electricitymaps} />
-          </Grid>
-          <Grid>
-            <EnergyCard energy={dashboardState.energy} />
-          </Grid>
-          <Grid>
-            <WeatherCard weather={dashboardState.weather} />
-          </Grid>
-          <Grid>
-            <TibberCard tibber={dashboardState.tibber} />
-          </Grid>
-          <Grid>
-            <FuelCard fuel={dashboardState.fuel} />
-          </Grid>
-        </Grid>
 
-        {/* Middle row - news */}
-        <Grid
-          container
-          spacing={1}
-          justifyContent="space-around"
-          alignItems="center"
-        >
-          <Grid size={12}>
-            <NewsCard
-              news={dashboardState.news}
-              lastUpdate={dashboardState.lastUpdate}
-            />
+          {/* Middle row - news */}
+          <Grid
+            container
+            spacing={1}
+            justifyContent="space-around"
+            alignItems="center"
+          >
+            <Grid size={12}>
+              <NewsCard
+                news={dashboardState.news}
+                lastUpdate={dashboardState.lastUpdate}
+              />
+            </Grid>
           </Grid>
-        </Grid>
 
-        {/* Bottom row - n8n and calendar (telephone box parked here, see PhoneCard import) */}
-        {/* Bottom row - n8n and calendar (telephone box parked here, see PhoneCard import) */}
-        <Grid
-          container
-          spacing={1}
-          justifyContent="space-around"
-          alignItems="center"
-          sx={{ flexWrap: "nowrap" }}
-        >
-          <Grid sx={{ flexGrow: 1, minWidth: 0 }}>
-            {/* <PhoneCard phone={dashboardState.phone} /> */}
-            <N8nCard n8n={dashboardState.n8n} />
-          </Grid>
-          <Grid sx={{ flexShrink: 0 }}>
-            <CalendarCard calendar={dashboardState.calendar} />
+          {/* Bottom row - n8n and calendar (telephone box parked here, see PhoneCard import) */}
+          <Grid
+            container
+            spacing={1}
+            justifyContent="space-around"
+            alignItems="center"
+            sx={{ flexWrap: "nowrap" }}
+          >
+            <Grid sx={{ flexGrow: 1, minWidth: 0 }}>
+              {/* <PhoneCard phone={dashboardState.phone} /> */}
+              <N8nCard n8n={dashboardState.n8n} />
+            </Grid>
+            <Grid sx={{ flexShrink: 0 }}>
+              <CalendarCard calendar={dashboardState.calendar} />
+            </Grid>
           </Grid>
         </Grid>
-      </Grid>
+      )}
     </ThemeProvider>
   );
 }

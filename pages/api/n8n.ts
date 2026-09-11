@@ -1,13 +1,6 @@
 import type { NextApiRequest, NextApiResponse } from "next";
 import { writeKey, readKey, safeParsePayload } from "../../utils/dbutils";
 
-const N8N_MAX_CHARS = process.env.N8N_MAX_CHARS as string;
-
-function truncateMarkdown(markdown: string, maxChars: number): string {
-  if (markdown.length <= maxChars) return markdown;
-  return markdown.slice(0, maxChars).trimEnd() + "…";
-}
-
 export default async function handler(
   req: NextApiRequest,
   res: NextApiResponse,
@@ -56,8 +49,5 @@ export default async function handler(
   }
 
   const markdown = safeParsePayload<string>(cachedData.data.payload, "");
-  const maxChars = parseInt(N8N_MAX_CHARS) || 800;
-  res
-    .status(200)
-    .json({ key: "n8n", items: truncateMarkdown(markdown, maxChars) });
+  res.status(200).json({ key: "n8n", items: markdown });
 }
