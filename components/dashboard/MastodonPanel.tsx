@@ -32,7 +32,7 @@ export default function MastodonPanel({
                 rel="noopener noreferrer"
                 className="hover:text-(--color-accent)"
               >
-                {stripHtml(p.content).slice(0, 90)}
+                {stripHtml(p.content).slice(0, 180)}
               </a>
             </li>
           ))}
