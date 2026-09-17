@@ -26,7 +26,7 @@ interface cacheItem {
  */
 export function safeParsePayload<T>(
   payload: string | undefined | null,
-  fallback: T
+  fallback: T,
 ): T {
   if (payload == null) return fallback;
   try {
@@ -52,7 +52,7 @@ export function safeParsePayload<T>(
  */
 export async function assertJsonResponse(
   response: Response,
-  label: string
+  label: string,
 ): Promise<void> {
   if (!response.ok) {
     let body = "";
@@ -63,7 +63,7 @@ export async function assertJsonResponse(
     }
     throw new Error(
       `${label} request failed: HTTP ${response.status} ${response.statusText}` +
-        (body ? ` — ${body.slice(0, 300)}` : "")
+        (body ? ` — ${body.slice(0, 300)}` : ""),
     );
   }
 
@@ -77,7 +77,7 @@ export async function assertJsonResponse(
     }
     throw new Error(
       `${label} returned non-JSON content-type "${contentType}". ` +
-        `Body preview: ${body.slice(0, 300)}`
+        `Body preview: ${body.slice(0, 300)}`,
     );
   }
 }

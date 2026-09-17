@@ -6,6 +6,7 @@ import ElectricityMapsCard from "@/components/ElectricityMapsCard";
 import NewsCard from "@/components/NewsCard";
 import PhoneCard from "@/components/PhoneCard"; // eslint-disable-line @typescript-eslint/no-unused-vars
 import N8nCard from "@/components/N8nCard";
+import MastodonCard from "@/components/MastodonCard";
 import CalendarCard from "@/components/CalendarCard";
 import FuelCard from "@/components/FuelCard";
 import WeatherCard from "@/components/WeatherCard";
@@ -42,6 +43,13 @@ interface ElectricityMapsData {
   };
 }
 
+interface MastodonPost {
+  id: string;
+  content: string;
+  created_at: string;
+  url: string;
+}
+
 interface DashboardState {
   n8n: Record<string, unknown> | null;
   traffic: Record<string, unknown> | null;
@@ -53,6 +61,7 @@ interface DashboardState {
   weather: Record<string, unknown> | null;
   tibber: Record<string, unknown> | null;
   energy: EnergyData | null;
+  mastodon: MastodonPost[] | null;
   lastUpdate: string;
 }
 
@@ -67,6 +76,7 @@ interface IndexPageProps {
   weather: Record<string, unknown> | null;
   tibber: Record<string, unknown> | null;
   energy: EnergyData | null;
+  mastodon: MastodonPost[] | null;
   lastUpdate: string;
 }
 
@@ -83,6 +93,7 @@ export default function Home({
   weather,
   tibber,
   energy,
+  mastodon,
   lastUpdate,
 }: IndexPageProps) {
   const [dashboardState, setDashboardState] = useState<DashboardState>({
@@ -96,6 +107,7 @@ export default function Home({
     weather,
     tibber,
     energy,
+    mastodon,
     lastUpdate,
   });
 
@@ -116,6 +128,7 @@ export default function Home({
         weatherRes,
         tibberRes,
         energyRes,
+        mastodonRes,
       ] = await Promise.all([
         fetch(`${apiUrl}/api/n8n`),
         fetch(`${apiUrl}/api/traffic`),
@@ -127,6 +140,7 @@ export default function Home({
         fetch(`${apiUrl}/api/weather`),
         fetch(`${apiUrl}/api/tibber`),
         fetch(`${apiUrl}/api/alphaess`),
+        fetch(`${apiUrl}/api/mastodon`),
       ]);
 
       const [
@@ -140,6 +154,7 @@ export default function Home({
         weatherData,
         tibberData,
         energyData,
+        mastodonData,
       ] = await Promise.all([
         n8nRes.json(),
         trafficRes.json(),
@@ -151,6 +166,7 @@ export default function Home({
         weatherRes.json(),
         tibberRes.json(),
         energyRes.json(),
+        mastodonRes.json(),
       ]);
 
       setDashboardState({
@@ -164,6 +180,7 @@ export default function Home({
         weather: weatherData,
         tibber: tibberData,
         energy: energyData,
+        mastodon: mastodonData,
         lastUpdate: new Date().toLocaleTimeString(),
       });
     } catch (error) {
@@ -242,7 +259,7 @@ export default function Home({
             </Grid>
           </Grid>
 
-          {/* Bottom row - n8n and calendar (telephone box parked here, see PhoneCard import) */}
+          {/* Bottom row - mastodon and calendar (telephone box parked here, see PhoneCard import) */}
           <Grid
             container
             spacing={1}
@@ -252,7 +269,10 @@ export default function Home({
           >
             <Grid sx={{ flexGrow: 1, minWidth: 0 }}>
               {/* <PhoneCard phone={dashboardState.phone} /> */}
-              <N8nCard n8n={dashboardState.n8n} />
+              <MastodonCard
+                mastodon={dashboardState.mastodon}
+                lastUpdate={dashboardState.lastUpdate}
+              />
             </Grid>
             <Grid sx={{ flexShrink: 0 }}>
               <CalendarCard calendar={dashboardState.calendar} />
@@ -279,6 +299,7 @@ export const getServerSideProps = async () => {
       weatherRes,
       tibberRes,
       energyRes,
+      mastodonRes,
     ] = await Promise.all([
       fetch(`${apiUrl}/api/n8n`),
       fetch(`${apiUrl}/api/traffic`),
@@ -290,6 +311,7 @@ export const getServerSideProps = async () => {
       fetch(`${apiUrl}/api/weather`),
       fetch(`${apiUrl}/api/tibber`),
       fetch(`${apiUrl}/api/alphaess`),
+      fetch(`${apiUrl}/api/mastodon`),
     ]);
 
     const [
@@ -303,6 +325,7 @@ export const getServerSideProps = async () => {
       weather,
       tibber,
       energy,
+      mastodon,
     ] = await Promise.all([
       n8nRes.json(),
       trafficRes.json(),
@@ -314,6 +337,7 @@ export const getServerSideProps = async () => {
       weatherRes.json(),
       tibberRes.json(),
       energyRes.json(),
+      mastodonRes.json(),
     ]);
 
     return {
@@ -328,6 +352,7 @@ export const getServerSideProps = async () => {
         weather,
         tibber,
         energy,
+        mastodon,
         lastUpdate: new Date().toLocaleTimeString(),
       },
     };
@@ -347,6 +372,7 @@ export const getServerSideProps = async () => {
         weather: null,
         tibber: null,
         energy: null,
+        mastodon: null,
         lastUpdate: `${new Date().toLocaleTimeString()} - Initial load error`,
       },
     };
