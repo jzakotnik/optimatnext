@@ -1,380 +1,111 @@
-import { ThemeProvider, createTheme } from "@mui/material/styles";
-import CssBaseline from "@mui/material/CssBaseline";
-import Grid from "@mui/material/Grid"; // MUI v7 uses Grid2 as the default Grid
-import TrafficCard from "@/components/TrafficCard";
-import ElectricityMapsCard from "@/components/ElectricityMapsCard";
-import NewsCard from "@/components/NewsCard";
-import PhoneCard from "@/components/PhoneCard"; // eslint-disable-line @typescript-eslint/no-unused-vars
-import N8nCard from "@/components/N8nCard";
-import MastodonCard from "@/components/MastodonCard";
-import CalendarCard from "@/components/CalendarCard";
-import FuelCard from "@/components/FuelCard";
-import WeatherCard from "@/components/WeatherCard";
-import TibberCard from "@/components/TibberCard";
-import EnergyCard from "@/components/EnergyCard";
-import { useEffect, useState, useCallback } from "react";
-import Box from "@mui/material/Box";
+import { useCallback, useEffect, useRef, useState } from "react";
+import type { GetServerSideProps } from "next";
+import type { CacheStore, CacheEntry } from "@/lib/cache/types";
+import StatusBar from "@/components/dashboard/StatusBar";
+import NewsPanel from "@/components/dashboard/NewsPanel";
+import MastodonPanel from "@/components/dashboard/MastodonPanel";
+import CalendarPanel from "@/components/dashboard/CalendarPanel";
+import {
+  TrafficTile,
+  WeatherTile,
+  ElectricityTile,
+  EnergyTile,
+  TibberTile,
+  FuelTile,
+} from "@/components/dashboard/StatTiles";
+import { formatClock } from "@/lib/date";
+import type { TrafficData } from "@/lib/sources/traffic";
+import type { WeatherData } from "@/lib/sources/weather";
+import type { ElectricityMapsData } from "@/lib/sources/electricitymaps";
+import type { EnergyData } from "@/lib/sources/energy";
+import type { TibberData } from "@/lib/sources/tibber";
+import type { FuelData } from "@/lib/sources/fuel";
+import type { NewsData } from "@/lib/sources/news";
+import type { MastodonPost } from "@/lib/sources/mastodon";
+import type { CalendarEvent } from "@/lib/sources/calendar";
 
-const darkTheme = createTheme({
-  palette: {
-    mode: "dark",
-  },
-});
+const POLL_INTERVAL_MS = 30000;
+const FETCH_TIMEOUT_MS = 8000;
+// Only flip to "offline" after two consecutive failed polls, so a single
+// dropped packet doesn't flash a scary banner on an otherwise fine network.
+const OFFLINE_AFTER_FAILURES = 2;
 
-// Define types for API responses
-interface EnergyData {
-  energy: {
-    data: {
-      ppv: number;
-      pgrid: number;
-      soc: number;
-    };
-  };
+interface DashboardProps {
+  initialData: CacheStore;
 }
 
-interface ElectricityMapsData {
-  items?: {
-    zone: string;
-    carbonIntensity: number;
-    datetime: string;
-    updatedAt: string;
-    isEstimated: boolean;
-    countryCode: string;
-  };
-}
+export default function Home({ initialData }: DashboardProps) {
+  const [data, setData] = useState<CacheStore>(initialData);
+  const [connected, setConnected] = useState(true);
+  const [offlineSince, setOfflineSince] = useState<Date | null>(null);
+  const [lastPolled, setLastPolled] = useState<Date>(new Date());
+  const failuresRef = useRef(0);
 
-interface MastodonPost {
-  id: string;
-  content: string;
-  created_at: string;
-  url: string;
-}
-
-interface DashboardState {
-  n8n: Record<string, unknown> | null;
-  traffic: Record<string, unknown> | null;
-  electricitymaps: ElectricityMapsData | null;
-  news: Record<string, unknown> | null;
-  phone: Record<string, unknown> | null;
-  calendar: Record<string, unknown> | null;
-  fuel: Record<string, unknown> | null;
-  weather: Record<string, unknown> | null;
-  tibber: Record<string, unknown> | null;
-  energy: EnergyData | null;
-  mastodon: MastodonPost[] | null;
-  lastUpdate: string;
-}
-
-interface IndexPageProps {
-  n8n: Record<string, unknown> | null;
-  traffic: Record<string, unknown> | null;
-  electricitymaps: ElectricityMapsData | null;
-  news: Record<string, unknown> | null;
-  phone: Record<string, unknown> | null;
-  calendar: Record<string, unknown> | null;
-  fuel: Record<string, unknown> | null;
-  weather: Record<string, unknown> | null;
-  tibber: Record<string, unknown> | null;
-  energy: EnergyData | null;
-  mastodon: MastodonPost[] | null;
-  lastUpdate: string;
-}
-
-type ViewMode = "dashboard" | "n8n";
-
-export default function Home({
-  n8n,
-  traffic,
-  electricitymaps,
-  news,
-  phone,
-  calendar,
-  fuel,
-  weather,
-  tibber,
-  energy,
-  mastodon,
-  lastUpdate,
-}: IndexPageProps) {
-  const [dashboardState, setDashboardState] = useState<DashboardState>({
-    n8n,
-    traffic,
-    electricitymaps,
-    news,
-    phone,
-    calendar,
-    fuel,
-    weather,
-    tibber,
-    energy,
-    mastodon,
-    lastUpdate,
-  });
-
-  const [viewMode, setViewMode] = useState<ViewMode>("dashboard");
-
-  const refreshAPI = useCallback(async () => {
-    const apiUrl = process.env.NEXT_PUBLIC_API_URL;
-
+  const poll = useCallback(async () => {
+    const controller = new AbortController();
+    const timer = setTimeout(() => controller.abort(), FETCH_TIMEOUT_MS);
     try {
-      const [
-        n8nRes,
-        trafficRes,
-        electricitymapsRes,
-        newsRes,
-        phoneRes,
-        calendarRes,
-        fuelRes,
-        weatherRes,
-        tibberRes,
-        energyRes,
-        mastodonRes,
-      ] = await Promise.all([
-        fetch(`${apiUrl}/api/n8n`),
-        fetch(`${apiUrl}/api/traffic`),
-        fetch(`${apiUrl}/api/electricitymaps`),
-        fetch(`${apiUrl}/api/spiegelfeed`),
-        fetch(`${apiUrl}/api/fritz`),
-        fetch(`${apiUrl}/api/calendar`),
-        fetch(`${apiUrl}/api/fuel`),
-        fetch(`${apiUrl}/api/weather`),
-        fetch(`${apiUrl}/api/tibber`),
-        fetch(`${apiUrl}/api/alphaess`),
-        fetch(`${apiUrl}/api/mastodon`),
-      ]);
-
-      const [
-        n8nData,
-        trafficData,
-        electricitymapsData,
-        newsData,
-        phoneData,
-        calendarData,
-        fuelData,
-        weatherData,
-        tibberData,
-        energyData,
-        mastodonData,
-      ] = await Promise.all([
-        n8nRes.json(),
-        trafficRes.json(),
-        electricitymapsRes.json(),
-        newsRes.json(),
-        phoneRes.json(),
-        calendarRes.json(),
-        fuelRes.json(),
-        weatherRes.json(),
-        tibberRes.json(),
-        energyRes.json(),
-        mastodonRes.json(),
-      ]);
-
-      setDashboardState({
-        n8n: n8nData,
-        traffic: trafficData,
-        electricitymaps: electricitymapsData,
-        news: newsData,
-        phone: phoneData,
-        calendar: calendarData,
-        fuel: fuelData,
-        weather: weatherData,
-        tibber: tibberData,
-        energy: energyData,
-        mastodon: mastodonData,
-        lastUpdate: new Date().toLocaleTimeString(),
-      });
+      const res = await fetch("/api/dashboard", { signal: controller.signal });
+      if (!res.ok) throw new Error(`HTTP ${res.status}`);
+      const json = (await res.json()) as CacheStore;
+      setData(json);
+      setLastPolled(new Date());
+      failuresRef.current = 0;
+      setConnected(true);
+      setOfflineSince(null);
     } catch (error) {
-      console.error("Error fetching data:", error);
-      setDashboardState((prev) => ({
-        ...prev,
-        lastUpdate: `${new Date().toLocaleTimeString()} - API Fehler`,
-      }));
+      failuresRef.current += 1;
+      console.warn("Dashboard poll failed:", error);
+      if (failuresRef.current >= OFFLINE_AFTER_FAILURES) {
+        setConnected(false);
+        setOfflineSince((prev) => prev ?? new Date());
+      }
+    } finally {
+      clearTimeout(timer);
     }
   }, []);
 
   useEffect(() => {
-    const interval = setInterval(refreshAPI, 30000); // 30 seconds
-
-    // Cleanup interval on component unmount
+    const interval = setInterval(poll, POLL_INTERVAL_MS);
     return () => clearInterval(interval);
-  }, [refreshAPI]);
-
-  /*useEffect(() => {
-    const rotateInterval = setInterval(() => {
-      setViewMode((prev) => (prev === "dashboard" ? "n8n" : "dashboard"));
-    }, 10000); // 10 seconds
-
-    return () => clearInterval(rotateInterval);
-  }, []);*/
+  }, [poll]);
 
   return (
-    <ThemeProvider theme={darkTheme}>
-      <CssBaseline />
+    <div className="flex h-screen w-screen flex-col gap-2 overflow-hidden p-3">
+      <div className="grid shrink-0 grid-cols-6 gap-2">
+        <TrafficTile entry={data.traffic as CacheEntry<TrafficData>} />
+        <ElectricityTile
+          entry={data.electricitymaps as CacheEntry<ElectricityMapsData>}
+        />
+        <EnergyTile entry={data.energy as CacheEntry<EnergyData>} />
+        <WeatherTile entry={data.weather as CacheEntry<WeatherData>} />
+        <TibberTile entry={data.tibber as CacheEntry<TibberData>} />
+        <FuelTile entry={data.fuel as CacheEntry<FuelData>} />
+      </div>
 
-      {viewMode === "n8n" ? (
-        <Box sx={{ height: "100vh", p: 2 }}>
-          <N8nCard n8n={dashboardState.n8n} fullscreen />
-        </Box>
-      ) : (
-        <Grid container direction="column" spacing={0.5} sx={{ p: 1 }}>
-          {/* Top row - info cards */}
-          <Grid
-            container
-            spacing={1}
-            justifyContent="space-around"
-            alignItems="stretch"
-          >
-            <Grid>
-              <TrafficCard traffic={dashboardState.traffic} />
-            </Grid>
-            <Grid>
-              <ElectricityMapsCard data={dashboardState.electricitymaps} />
-            </Grid>
-            <Grid>
-              <EnergyCard energy={dashboardState.energy} />
-            </Grid>
-            <Grid>
-              <WeatherCard weather={dashboardState.weather} />
-            </Grid>
-            <Grid>
-              <TibberCard tibber={dashboardState.tibber} />
-            </Grid>
-            <Grid>
-              <FuelCard fuel={dashboardState.fuel} />
-            </Grid>
-          </Grid>
+      <div className="grid min-h-0 flex-1 grid-rows-2 gap-2">
+        <NewsPanel entry={data.news as CacheEntry<NewsData>} />
+        <div className="flex min-h-0 gap-2">
+          <MastodonPanel entry={data.mastodon as CacheEntry<MastodonPost[]>} />
+          <CalendarPanel
+            entry={data.calendar as CacheEntry<CalendarEvent[]>}
+          />
+        </div>
+      </div>
 
-          {/* Middle row - news */}
-          <Grid
-            container
-            spacing={1}
-            justifyContent="space-around"
-            alignItems="center"
-          >
-            <Grid size={12}>
-              <NewsCard
-                news={dashboardState.news}
-                lastUpdate={dashboardState.lastUpdate}
-              />
-            </Grid>
-          </Grid>
-
-          {/* Bottom row - mastodon and calendar (telephone box parked here, see PhoneCard import) */}
-          <Grid
-            container
-            spacing={1}
-            justifyContent="space-around"
-            alignItems="center"
-            sx={{ flexWrap: "nowrap" }}
-          >
-            <Grid sx={{ flexGrow: 1, minWidth: 0 }}>
-              {/* <PhoneCard phone={dashboardState.phone} /> */}
-              <MastodonCard
-                mastodon={dashboardState.mastodon}
-                lastUpdate={dashboardState.lastUpdate}
-              />
-            </Grid>
-            <Grid sx={{ flexShrink: 0 }}>
-              <CalendarCard calendar={dashboardState.calendar} />
-            </Grid>
-          </Grid>
-        </Grid>
-      )}
-    </ThemeProvider>
+      <StatusBar
+        connected={connected}
+        offlineSinceLabel={offlineSince ? formatClock(offlineSince) : null}
+        lastUpdatedLabel={formatClock(lastPolled)}
+      />
+    </div>
   );
 }
 
-export const getServerSideProps = async () => {
-  const apiUrl = process.env.NEXT_PUBLIC_API_URL;
-
-  try {
-    const [
-      n8nRes,
-      trafficRes,
-      electricitymapsRes,
-      newsRes,
-      phoneRes,
-      calendarRes,
-      fuelRes,
-      weatherRes,
-      tibberRes,
-      energyRes,
-      mastodonRes,
-    ] = await Promise.all([
-      fetch(`${apiUrl}/api/n8n`),
-      fetch(`${apiUrl}/api/traffic`),
-      fetch(`${apiUrl}/api/electricitymaps`),
-      fetch(`${apiUrl}/api/spiegelfeed`),
-      fetch(`${apiUrl}/api/fritz`),
-      fetch(`${apiUrl}/api/calendar`),
-      fetch(`${apiUrl}/api/fuel`),
-      fetch(`${apiUrl}/api/weather`),
-      fetch(`${apiUrl}/api/tibber`),
-      fetch(`${apiUrl}/api/alphaess`),
-      fetch(`${apiUrl}/api/mastodon`),
-    ]);
-
-    const [
-      n8n,
-      traffic,
-      electricitymaps,
-      news,
-      phone,
-      calendar,
-      fuel,
-      weather,
-      tibber,
-      energy,
-      mastodon,
-    ] = await Promise.all([
-      n8nRes.json(),
-      trafficRes.json(),
-      electricitymapsRes.json(),
-      newsRes.json(),
-      phoneRes.json(),
-      calendarRes.json(),
-      fuelRes.json(),
-      weatherRes.json(),
-      tibberRes.json(),
-      energyRes.json(),
-      mastodonRes.json(),
-    ]);
-
-    return {
-      props: {
-        n8n,
-        traffic,
-        electricitymaps,
-        news,
-        phone,
-        calendar,
-        fuel,
-        weather,
-        tibber,
-        energy,
-        mastodon,
-        lastUpdate: new Date().toLocaleTimeString(),
-      },
-    };
-  } catch (error) {
-    console.error("Error in getServerSideProps:", error);
-
-    // Return empty/default props on error
-    return {
-      props: {
-        n8n: null,
-        traffic: null,
-        electricitymaps: null,
-        news: null,
-        phone: null,
-        calendar: null,
-        fuel: null,
-        weather: null,
-        tibber: null,
-        energy: null,
-        mastodon: null,
-        lastUpdate: `${new Date().toLocaleTimeString()} - Initial load error`,
-      },
-    };
-  }
+export const getServerSideProps: GetServerSideProps<DashboardProps> = async () => {
+  // Dynamically imported so this Node-only, fs-backed module never ends up
+  // in the client bundle.
+  const { getAll } = await import("@/lib/cache/store");
+  const initialData = await getAll();
+  return { props: { initialData } };
 };
