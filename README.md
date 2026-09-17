@@ -2,7 +2,7 @@
 
 ## What is it about?
 
-I wanted to have a simple dashboard in the kitchen displaying relevant information for the family life - both with home related information and stuff like calendar and missed calls. It runs on a small, low-resolution (1366x768) always-on kitchen screen, so the UI is built for high contrast and readability at a distance rather than for touch interaction.
+I wanted to have a simple dashboard in the kitchen displaying relevant information for the family life - home related information plus stuff like calendar and news. It runs on a small, low-resolution (1366x768) always-on kitchen screen, so the UI is built for high contrast and readability at a distance rather than for touch interaction.
 
 ![Screenshot](./doc/screenshot1.png "Screenshot")
 
@@ -17,7 +17,7 @@ Currently it displays:
 - Family calendar
 - Mastodon home timeline
 
-(Missed calls via FritzBox and an n8n markdown feed are also wired up as data sources, but are not shown on the dashboard by default.)
+(An n8n markdown feed is also wired up as a data source, but is not shown on the dashboard by default.)
 
 ![Screenshot](./doc/screenshot2.png "Screenshot")
 
@@ -44,6 +44,3 @@ This design means an API outage, a network blip, or a strict rate limit on one p
 - Run `npm install`
 - Run `npm run dev` and check if it's all working
 - Run `npm run build` and let `pm2` manage the restarts etc
-
-## Known issues
-- The FritzBox integration can lose its session token after a while and stop returning phone calls.

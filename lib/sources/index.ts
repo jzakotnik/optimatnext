@@ -8,7 +8,6 @@ import { fetchFuel } from "./fuel";
 import { fetchNews } from "./news";
 import { fetchMastodon } from "./mastodon";
 import { fetchCalendar } from "./calendar";
-import { fetchPhone } from "./phone";
 
 export interface SourceDefinition {
   key: string;
@@ -62,10 +61,5 @@ export const sources: SourceDefinition[] = [
     key: "calendar",
     ttlMs: ttlMsFromEnv("GOOGLECALENDAR_CACHE_SECONDS", 900),
     fetcher: fetchCalendar,
-  },
-  {
-    key: "phone",
-    ttlMs: ttlMsFromEnv("FRITZ_CACHE_SECONDS", 300),
-    fetcher: fetchPhone,
   },
 ];
