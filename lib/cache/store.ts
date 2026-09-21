@@ -12,9 +12,17 @@ async function load(): Promise<void> {
   try {
     const raw = await fs.readFile(CACHE_FILE, "utf-8");
     store = JSON.parse(raw) as CacheStore;
-  } catch {
-    // No cache file yet (first run) or it's corrupt — start empty rather than crash.
+  } catch (error) {
+    const isMissing = (error as NodeJS.ErrnoException)?.code === "ENOENT";
     store = {};
+    if (!isMissing) {
+      // Corrupt (not just absent) — keep the bad file around for inspection
+      // instead of silently discarding it, and start every source fresh.
+      console.warn("[cache] store.json was corrupt, starting empty:", error);
+      await fs
+        .rename(CACHE_FILE, `${CACHE_FILE}.corrupt-${Date.now()}`)
+        .catch(() => {});
+    }
   }
 }
 
@@ -23,16 +31,24 @@ function ensureLoaded(): Promise<void> {
   return loadPromise;
 }
 
+// Serializes disk writes so two sources updating around the same time can
+// never race on the same tmp file / interleave a write with a rename —
+// each write is queued to see the full, latest in-memory store.
+let persistQueue: Promise<void> = Promise.resolve();
+
 /** Atomic write (tmp file + rename) so a crash mid-write never corrupts the cache. */
-async function persist(): Promise<void> {
-  try {
-    await fs.mkdir(CACHE_DIR, { recursive: true });
-    const tmp = `${CACHE_FILE}.${process.pid}.tmp`;
-    await fs.writeFile(tmp, JSON.stringify(store));
-    await fs.rename(tmp, CACHE_FILE);
-  } catch (error) {
-    console.warn("[cache] failed to persist cache to disk:", error);
-  }
+function persist(): Promise<void> {
+  persistQueue = persistQueue.then(async () => {
+    try {
+      await fs.mkdir(CACHE_DIR, { recursive: true });
+      const tmp = `${CACHE_FILE}.${process.pid}.${Date.now()}.${Math.random().toString(36).slice(2)}.tmp`;
+      await fs.writeFile(tmp, JSON.stringify(store));
+      await fs.rename(tmp, CACHE_FILE);
+    } catch (error) {
+      console.warn("[cache] failed to persist cache to disk:", error);
+    }
+  });
+  return persistQueue;
 }
 
 export async function getAll(): Promise<CacheStore> {
