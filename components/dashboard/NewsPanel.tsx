@@ -11,8 +11,8 @@ export default function NewsPanel({ entry }: { entry?: CacheEntry<NewsData> }) {
         <p className="text-2xl text-(--color-fg-muted)">Keine Nachrichten</p>
       ) : (
         <ul className="space-y-1.5">
-          {titles.slice(0, 6).map((title, i) => (
-            <li key={i} className="text-2xl font-semibold leading-snug">
+          {titles.slice(0, 5).map((title, i) => (
+            <li key={i} className="truncate text-2xl font-semibold leading-snug">
               {title}
             </li>
           ))}

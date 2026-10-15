@@ -73,7 +73,7 @@ export default function Home({ initialData }: DashboardProps) {
 
   return (
     <div className="flex h-screen w-screen flex-col gap-2 overflow-hidden p-3">
-      <div className="grid shrink-0 grid-cols-6 gap-2">
+      <div className="grid shrink-0 grid-cols-[repeat(6,minmax(0,1fr))] gap-2">
         <TrafficTile entry={data.traffic as CacheEntry<TrafficData>} />
         <ElectricityTile
           entry={data.electricitymaps as CacheEntry<ElectricityMapsData>}
@@ -84,7 +84,7 @@ export default function Home({ initialData }: DashboardProps) {
         <FuelTile entry={data.fuel as CacheEntry<FuelData>} />
       </div>
 
-      <div className="grid min-h-0 flex-1 grid-rows-2 gap-2">
+      <div className="grid min-h-0 flex-1 grid-rows-[auto_minmax(0,1fr)] gap-2">
         <NewsPanel entry={data.news as CacheEntry<NewsData>} />
         <div className="flex min-h-0 gap-2">
           <MastodonPanel entry={data.mastodon as CacheEntry<MastodonPost[]>} />

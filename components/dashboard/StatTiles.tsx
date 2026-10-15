@@ -36,17 +36,24 @@ export function WeatherTile({ entry }: { entry?: CacheEntry<WeatherData> }) {
   );
 }
 
+/** Grid carbon intensity (g CO₂/kWh) that counts as 100 % on the tile. */
+const CARBON_REFERENCE_G_PER_KWH = 500;
+
 export function ElectricityTile({
   entry,
 }: {
   entry?: CacheEntry<ElectricityMapsData>;
 }) {
   const intensity = entry?.data?.carbonIntensity;
+  const percent =
+    intensity != null
+      ? Math.round((intensity / CARBON_REFERENCE_G_PER_KWH) * 100)
+      : null;
   return (
     <StatTile
       icon={Leaf}
-      value={`${intensity} g`}
-      label={`CO₂/kWh${entry?.data?.isEstimated ? " (geschätzt)" : ""}`}
+      value={`${percent} %`}
+      label={`CO₂ (${CARBON_REFERENCE_G_PER_KWH} g = 100 %)${entry?.data?.isEstimated ? ", geschätzt" : ""}`}
       noData={intensity == null}
       tone={intensity != null ? toneForRange(intensity, 100, 300) : undefined}
       stale={entry?.stale}
