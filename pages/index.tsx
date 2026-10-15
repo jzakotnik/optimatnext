@@ -41,11 +41,13 @@ export default function Home({ initialData }: DashboardProps) {
   const [lastPolled, setLastPolled] = useState<Date>(new Date());
   const failuresRef = useRef(0);
 
-  const poll = useCallback(async () => {
+  const poll = useCallback(async ({ res }) => {
+  res.setHeader("Cache-Control", "no-store, max-age=0");
     const controller = new AbortController();
     const timer = setTimeout(() => controller.abort(), FETCH_TIMEOUT_MS);
     try {
-      const res = await fetch("/api/dashboard", { signal: controller.signal });
+      const res = await fetch("/api/dashboard", {
+        cache: "no-store", signal: controller.signal });
       if (!res.ok) throw new Error(`HTTP ${res.status}`);
       const json = (await res.json()) as CacheStore;
       setData(json);
@@ -105,7 +107,7 @@ export default function Home({ initialData }: DashboardProps) {
 export const getServerSideProps: GetServerSideProps<DashboardProps> = async () => {
   // Dynamically imported so this Node-only, fs-backed module never ends up
   // in the client bundle.
-  const { getAll } = await import("@/lib/cache/store");
-  const initialData = await getAll();
+  const { readSnapshot } = await import("@/lib/cache/store");
+  const initialData = await readSnapshot();
   return { props: { initialData } };
 };
