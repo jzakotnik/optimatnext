@@ -21,11 +21,11 @@ export default function MastodonPanel({
       className="flex-1"
     >
       {posts.length === 0 ? (
-        <p className="text-lg text-(--color-fg-muted)">Keine Beiträge</p>
+        <p className="text-2xl text-(--color-fg-muted)">Keine Beiträge</p>
       ) : (
         <ul className="space-y-1.5">
           {posts.slice(0, 5).map((p) => (
-            <li key={p.id} className="text-lg font-semibold leading-snug">
+            <li key={p.id} className="text-2xl font-semibold leading-snug">
               <a
                 href={p.url}
                 target="_blank"

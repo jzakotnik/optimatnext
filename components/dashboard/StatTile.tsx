@@ -31,14 +31,14 @@ export default function StatTile({
       <div className="flex items-center gap-2 px-3">
         <Icon
           className={cn(
-            "size-6 shrink-0",
+            "size-8 shrink-0",
             noData ? "text-(--color-fg-muted)" : toneTextClass[tone],
           )}
           strokeWidth={2.25}
         />
         <span
           className={cn(
-            "truncate text-2xl font-bold tabular-nums",
+            "truncate text-4xl font-bold tabular-nums",
             noData && "text-(--color-fg-muted)",
           )}
         >
@@ -51,7 +51,7 @@ export default function StatTile({
           />
         )}
       </div>
-      <div className="px-3 text-sm font-medium text-(--color-fg-muted)">
+      <div className="px-3 text-xl font-medium leading-tight text-(--color-fg-muted)">
         {label}
         {detail ? <span className="block">{detail}</span> : null}
       </div>
