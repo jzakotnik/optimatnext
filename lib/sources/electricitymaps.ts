@@ -7,7 +7,7 @@ export interface ElectricityMapsData {
   isEstimated: boolean;
 }
 
-// Response of the /v3/renewable-energy/latest endpoint.
+// Response of the /v3/power-breakdown/latest endpoint.
 interface ElectricityMapsResponse {
   zone: string;
   renewablePercentage: number;
@@ -28,7 +28,7 @@ export async function fetchElectricityMaps(): Promise<ElectricityMapsData> {
   );
   if (typeof data.renewablePercentage !== "number") {
     throw new Error(
-      "ElectricityMaps response missing renewablePercentage (is ELECTRICITYMAPS_URL the /v3/renewable-energy/latest endpoint?)",
+      "ElectricityMaps response missing renewablePercentage (is ELECTRICITYMAPS_URL the /v3/power-breakdown/latest endpoint?)",
     );
   }
   return {
