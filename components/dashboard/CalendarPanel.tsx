@@ -18,11 +18,11 @@ export default function CalendarPanel({
       className="w-72 shrink-0"
     >
       {events.length === 0 ? (
-        <p className="text-lg text-(--color-fg-muted)">Keine Termine</p>
+        <p className="text-2xl text-(--color-fg-muted)">Keine Termine</p>
       ) : (
         <ul className="space-y-1.5">
           {events.slice(0, 5).map((e, i) => (
-            <li key={i} className="text-lg font-semibold leading-snug">
+            <li key={i} className="text-2xl font-semibold leading-snug">
               {e.dateTime
                 ? formatDateTime(e.dateTime)
                 : e.date

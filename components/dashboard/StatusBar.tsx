@@ -12,7 +12,7 @@ export default function StatusBar({
   lastUpdatedLabel,
 }: StatusBarProps) {
   return (
-    <div className="flex items-center justify-between px-1 text-sm text-(--color-fg-muted)">
+    <div className="flex items-center justify-between px-1 text-lg text-(--color-fg-muted)">
       <span>Stand: {lastUpdatedLabel}</span>
       {!connected && (
         <span className="flex items-center gap-1.5 font-semibold text-(--color-bad)">
