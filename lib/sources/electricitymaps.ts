@@ -10,8 +10,26 @@ export interface ElectricityMapsData {
 // Response of the /v3/power-breakdown/latest endpoint.
 interface ElectricityMapsResponse {
   zone: string;
-  renewablePercentage: number;
-  isEstimated: boolean;
+  renewablePercentage?: number | null;
+  powerConsumptionBreakdown?: Record<string, number | null> | null;
+  isEstimated?: boolean;
+}
+
+const RENEWABLE_SOURCES = ["biomass", "geothermal", "wind", "solar", "hydro"];
+
+/** Share of renewables in the consumption mix, derived from the breakdown. */
+function renewableShare(
+  breakdown: Record<string, number | null> | null | undefined,
+): number | null {
+  if (!breakdown) return null;
+  let total = 0;
+  let renewable = 0;
+  for (const [source, mw] of Object.entries(breakdown)) {
+    if (typeof mw !== "number" || mw <= 0) continue;
+    total += mw;
+    if (RENEWABLE_SOURCES.includes(source)) renewable += mw;
+  }
+  return total > 0 ? (renewable / total) * 100 : null;
 }
 
 export async function fetchElectricityMaps(): Promise<ElectricityMapsData> {
@@ -26,14 +44,18 @@ export async function fetchElectricityMaps(): Promise<ElectricityMapsData> {
     { headers: { "auth-token": apikey, "Content-Type": "application/json" } },
     "ElectricityMaps",
   );
-  if (typeof data.renewablePercentage !== "number") {
+  const percentage =
+    typeof data.renewablePercentage === "number"
+      ? data.renewablePercentage
+      : renewableShare(data.powerConsumptionBreakdown);
+  if (percentage == null) {
     throw new Error(
-      "ElectricityMaps response missing renewablePercentage (is ELECTRICITYMAPS_URL the /v3/power-breakdown/latest endpoint?)",
+      "ElectricityMaps response has neither renewablePercentage nor powerConsumptionBreakdown (is ELECTRICITYMAPS_URL the /v3/power-breakdown/latest endpoint?)",
     );
   }
   return {
     zone: data.zone,
-    renewablePercentage: Math.round(data.renewablePercentage),
+    renewablePercentage: Math.round(percentage),
     isEstimated: Boolean(data.isEstimated),
   };
 }
