@@ -13,6 +13,7 @@ export default async function handler(
   req: NextApiRequest,
   res: NextApiResponse<CacheStore>,
 ) {
+  res.setHeader("Cache-Control", "no-store, max-age=0");
   const snapshot = await readSnapshot();
   res.status(200).json(snapshot);
 }
