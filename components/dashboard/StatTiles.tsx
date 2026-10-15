@@ -41,14 +41,14 @@ export function ElectricityTile({
 }: {
   entry?: CacheEntry<ElectricityMapsData>;
 }) {
-  const intensity = entry?.data?.carbonIntensity;
+  const percent = entry?.data?.renewablePercentage;
   return (
     <StatTile
       icon={Leaf}
-      value={`${intensity} g`}
-      label={`CO₂/kWh${entry?.data?.isEstimated ? " (geschätzt)" : ""}`}
-      noData={intensity == null}
-      tone={intensity != null ? toneForRange(intensity, 100, 300) : undefined}
+      value={`${percent} %`}
+      label={`Grünstrom${entry?.data?.isEstimated ? " (geschätzt)" : ""}`}
+      noData={percent == null}
+      tone={percent != null ? toneForRange(percent, 25, 50, true) : undefined}
       stale={entry?.stale}
     />
   );

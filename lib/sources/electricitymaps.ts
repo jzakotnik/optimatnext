@@ -2,13 +2,15 @@ import { fetchJson } from "@/lib/http";
 
 export interface ElectricityMapsData {
   zone: string;
-  carbonIntensity: number;
+  /** Share of renewable electricity in the grid mix right now, 0-100. */
+  renewablePercentage: number;
   isEstimated: boolean;
 }
 
+// Response of the /v3/renewable-energy/latest endpoint.
 interface ElectricityMapsResponse {
   zone: string;
-  carbonIntensity: number;
+  renewablePercentage: number;
   isEstimated: boolean;
 }
 
@@ -24,12 +26,14 @@ export async function fetchElectricityMaps(): Promise<ElectricityMapsData> {
     { headers: { "auth-token": apikey, "Content-Type": "application/json" } },
     "ElectricityMaps",
   );
-  if (typeof data.carbonIntensity !== "number") {
-    throw new Error("ElectricityMaps response missing carbonIntensity");
+  if (typeof data.renewablePercentage !== "number") {
+    throw new Error(
+      "ElectricityMaps response missing renewablePercentage (is ELECTRICITYMAPS_URL the /v3/renewable-energy/latest endpoint?)",
+    );
   }
   return {
     zone: data.zone,
-    carbonIntensity: Math.round(data.carbonIntensity),
+    renewablePercentage: Math.round(data.renewablePercentage),
     isEstimated: Boolean(data.isEstimated),
   };
 }

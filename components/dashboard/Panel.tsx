@@ -30,7 +30,7 @@ export default function Panel({
           />
         )}
       </CardHeader>
-      <CardContent className="min-h-0 overflow-auto">{children}</CardContent>
+      <CardContent className="min-h-0 overflow-hidden">{children}</CardContent>
     </Card>
   );
 }

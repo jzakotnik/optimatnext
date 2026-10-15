@@ -18,21 +18,24 @@ export default function MastodonPanel({
       icon={AtSign}
       title="Mastodon"
       stale={entry?.stale}
-      className="flex-1"
+      className="min-w-0 flex-1"
     >
       {posts.length === 0 ? (
         <p className="text-2xl text-(--color-fg-muted)">Keine Beiträge</p>
       ) : (
         <ul className="space-y-1.5">
-          {posts.slice(0, 5).map((p) => (
-            <li key={p.id} className="text-2xl font-semibold leading-snug">
+          {posts.slice(0, 3).map((p) => (
+            <li
+              key={p.id}
+              className="line-clamp-2 text-2xl font-semibold leading-snug"
+            >
               <a
                 href={p.url}
                 target="_blank"
                 rel="noopener noreferrer"
                 className="hover:text-(--color-accent)"
               >
-                {stripHtml(p.content).slice(0, 180)}
+                {stripHtml(p.content)}
               </a>
             </li>
           ))}
