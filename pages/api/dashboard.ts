@@ -1,5 +1,5 @@
 import type { NextApiRequest, NextApiResponse } from "next";
-import { getAll } from "@/lib/cache/store";
+import { readSnapshot } from "@/lib/cache/store";
 import type { CacheStore } from "@/lib/cache/types";
 
 /**
@@ -13,6 +13,6 @@ export default async function handler(
   req: NextApiRequest,
   res: NextApiResponse<CacheStore>,
 ) {
-  const snapshot = await getAll();
+  const snapshot = await readSnapshot();
   res.status(200).json(snapshot);
 }

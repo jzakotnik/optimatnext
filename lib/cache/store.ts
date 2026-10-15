@@ -56,6 +56,30 @@ export async function getAll(): Promise<CacheStore> {
   return store;
 }
 
+/**
+ * Fresh snapshot for readers (API routes). Next.js can bundle instrumentation
+ * and API routes as separate module instances, so the in-memory `store` here
+ * may not be the one the scheduler writes to. The persisted file is the shared
+ * source of truth: re-read it whenever it changes on disk.
+ */
+let snapshot: CacheStore | null = null;
+let snapshotMtimeMs = 0;
+
+export async function readSnapshot(): Promise<CacheStore> {
+  try {
+    const { mtimeMs } = await fs.stat(CACHE_FILE);
+    if (!snapshot || mtimeMs !== snapshotMtimeMs) {
+      const raw = await fs.readFile(CACHE_FILE, "utf-8");
+      snapshot = JSON.parse(raw) as CacheStore;
+      snapshotMtimeMs = mtimeMs;
+    }
+    return snapshot;
+  } catch {
+    // Missing or mid-replace/corrupt file: serve last good snapshot, else memory.
+    return snapshot ?? getAll();
+  }
+}
+
 export async function getEntry<T>(key: string): Promise<CacheEntry<T>> {
   await ensureLoaded();
   return (store[key] as CacheEntry<T>) ?? emptyEntry<T>();

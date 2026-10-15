@@ -105,7 +105,7 @@ export default function Home({ initialData }: DashboardProps) {
 export const getServerSideProps: GetServerSideProps<DashboardProps> = async () => {
   // Dynamically imported so this Node-only, fs-backed module never ends up
   // in the client bundle.
-  const { getAll } = await import("@/lib/cache/store");
-  const initialData = await getAll();
+  const { readSnapshot } = await import("@/lib/cache/store");
+  const initialData = await readSnapshot();
   return { props: { initialData } };
 };
