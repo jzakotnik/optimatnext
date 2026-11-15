@@ -15,7 +15,7 @@ export default function CalendarPanel({
       icon={CalendarDays}
       title="Kalender"
       stale={entry?.stale}
-      className="w-[42%] shrink-0"
+      className="w-[55%] shrink-0"
     >
       {events.length === 0 ? (
         <p className="text-2xl text-(--color-fg-muted)">Keine Termine</p>
