@@ -84,7 +84,7 @@ export default function Home({ initialData }: DashboardProps) {
         <FuelTile entry={data.fuel as CacheEntry<FuelData>} />
       </div>
 
-      <div className="grid min-h-0 flex-1 grid-rows-[auto_minmax(0,1fr)] gap-2">
+      <div className="grid min-h-0 flex-1 grid-rows-[minmax(0,auto)_minmax(11rem,1fr)] gap-2">
         <NewsPanel entry={data.news as CacheEntry<NewsData>} />
         <div className="flex min-h-0 gap-2">
           <MastodonPanel entry={data.mastodon as CacheEntry<MastodonPost[]>} />
