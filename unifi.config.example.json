@@ -1,0 +1,11 @@
+{
+  "poorSignalDbm": -70,
+  "namedClientsAreKnown": true,
+  "knownMacSuffixes": ["ef:c2"],
+  "knownNames": ["SomeHostname"],
+  "knownClients": [
+    "aa:bb:cc:dd:ee:ff",
+    { "mac": "11:22:33:44:55:66", "name": "Guest phone" }
+  ],
+  "ignoreMacs": []
+}
