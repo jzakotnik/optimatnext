@@ -51,6 +51,11 @@ export default function NetworkPanel({
               ? `${poorNow} Gerät(e) mit schwachem WLAN`
               : "Neue unbekannte Geräte"}
         </li>
+        {d.unknownClients.length === 0 && (
+          <li className="truncate text-(--color-good)">
+            Keine unbekannten Geräte
+          </li>
+        )}
         {d.unknownClients.map((u) => (
           <li key={u.mac} className="truncate text-(--color-bad)">
             {formatDateTime(new Date(u.firstSeen).toISOString())} Neu: {u.name}
