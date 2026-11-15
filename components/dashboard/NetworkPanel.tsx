@@ -19,6 +19,11 @@ export default function NetworkPanel({
         className="min-w-0 flex-1 overflow-hidden"
       >
         <p className="text-2xl text-(--color-fg-muted)">Keine Daten</p>
+        {entry?.error && (
+          <p className="mt-1 line-clamp-3 text-lg text-(--color-bad)">
+            {entry.error}
+          </p>
+        )}
       </Panel>
     );
   }

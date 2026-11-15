@@ -1,4 +1,5 @@
 import { promises as fs } from "fs";
+import http from "http";
 import https from "https";
 import path from "path";
 import { getEntry } from "@/lib/cache/store";
@@ -80,8 +81,9 @@ interface HttpsResponse {
   body: string;
 }
 
-/** The controller uses a self-signed cert on the LAN, so we use node:https
- * (fetch can't opt out of verification without extra deps). */
+/** Works with http:// or https:// controller URLs. For https the controller
+ * usually has a self-signed cert, so we use node:https (fetch can't opt out of
+ * verification without extra deps). */
 function request(
   url: URL,
   method: "GET" | "POST",
@@ -90,9 +92,10 @@ function request(
 ): Promise<HttpsResponse> {
   const verify = process.env.UNIFI_VERIFY_TLS === "true";
   return new Promise((resolve, reject) => {
-    const req = https.request(
+    const lib = url.protocol === "http:" ? http : https;
+    const req = lib.request(
       url,
-      { method, headers, rejectUnauthorized: verify, timeout: 10000 },
+      { method, headers, rejectUnauthorized: verify, timeout: 10000 } as https.RequestOptions,
       (res) => {
         let data = "";
         res.on("data", (c) => (data += c));
