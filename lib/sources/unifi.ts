@@ -44,6 +44,10 @@ interface UnifiConfig {
   /** Treat clients that have a name/alias in the UniFi UI as known (default true). */
   namedClientsAreKnown?: boolean;
   ignoreMacs?: string[];
+  /** Last bytes of a MAC, e.g. "ef:c2" — for when you only know what the UniFi UI shows. */
+  knownMacSuffixes?: string[];
+  /** Matches the UniFi name or hostname, case-insensitive. */
+  knownNames?: string[];
 }
 
 interface UnifiClient {
@@ -167,6 +171,8 @@ export async function fetchUnifi(): Promise<UnifiData> {
     (config.knownClients ?? []).map((k) => normMac(typeof k === "string" ? k : k.mac)),
   );
   for (const m of config.ignoreMacs ?? []) known.add(normMac(m));
+  const macSuffixes = (config.knownMacSuffixes ?? []).map(normMac);
+  const knownNames = new Set((config.knownNames ?? []).map((n) => n.trim().toLowerCase()));
 
   const headers = await authHeaders(base);
   const [clients, devices] = await Promise.all([
@@ -191,7 +197,11 @@ export async function fetchUnifi(): Promise<UnifiData> {
     const alias = c.name?.trim();
     const label = alias || c.hostname || mac;
 
-    const isKnown = known.has(mac) || (namedAreKnown && !!alias);
+    const isKnown =
+      known.has(mac) ||
+      macSuffixes.some((suffix) => mac.endsWith(suffix)) ||
+      [alias, c.hostname].some((n) => n && knownNames.has(n.trim().toLowerCase())) ||
+      (namedAreKnown && !!alias);
     if (!isKnown && !unknownSeen.has(mac)) {
       unknownSeen.add(mac);
       unknownClients.unshift({ mac, name: c.hostname ?? mac, ip: c.ip ?? null, firstSeen: now });
