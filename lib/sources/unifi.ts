@@ -191,7 +191,7 @@ export async function fetchUnifi(): Promise<UnifiData> {
     const isKnown = known.has(mac) || (namedAreKnown && !!alias);
     if (!isKnown && !unknownSeen.has(mac)) {
       unknownSeen.add(mac);
-      unknownClients.unshift({ mac, name: c.hostname ?? "(ohne Name)", ip: c.ip ?? null, firstSeen: now });
+      unknownClients.unshift({ mac, name: c.hostname ?? mac, ip: c.ip ?? null, firstSeen: now });
     }
 
     if (!c.is_wired && typeof c.signal === "number" && c.signal < threshold) {

@@ -48,7 +48,7 @@ export default function NetworkPanel({
         </li>
         {d.unknownClients.map((u) => (
           <li key={u.mac} className="truncate text-(--color-bad)">
-            Unbekannt: {u.name} ({u.mac.slice(-8)}) · {formatDateTime(new Date(u.firstSeen).toISOString())}
+            {formatDateTime(new Date(u.firstSeen).toISOString())} Neu: {u.name}
           </li>
         ))}
         {d.poorSignals.map((p) => (
