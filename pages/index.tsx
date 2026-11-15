@@ -3,7 +3,7 @@ import type { GetServerSideProps } from "next";
 import type { CacheStore, CacheEntry } from "@/lib/cache/types";
 import StatusBar from "@/components/dashboard/StatusBar";
 import NewsPanel from "@/components/dashboard/NewsPanel";
-import MastodonPanel from "@/components/dashboard/MastodonPanel";
+import NetworkPanel from "@/components/dashboard/NetworkPanel";
 import CalendarPanel from "@/components/dashboard/CalendarPanel";
 import {
   TrafficTile,
@@ -21,7 +21,7 @@ import type { EnergyData } from "@/lib/sources/energy";
 import type { TibberData } from "@/lib/sources/tibber";
 import type { FuelData } from "@/lib/sources/fuel";
 import type { NewsData } from "@/lib/sources/news";
-import type { MastodonPost } from "@/lib/sources/mastodon";
+import type { UnifiData } from "@/lib/sources/unifi";
 import type { CalendarEvent } from "@/lib/sources/calendar";
 
 const POLL_INTERVAL_MS = 30000;
@@ -87,7 +87,7 @@ export default function Home({ initialData }: DashboardProps) {
       <div className="grid min-h-0 flex-1 grid-rows-[minmax(0,auto)_minmax(11rem,1fr)] gap-2">
         <NewsPanel entry={data.news as CacheEntry<NewsData>} />
         <div className="flex min-h-0 gap-2">
-          <MastodonPanel entry={data.mastodon as CacheEntry<MastodonPost[]>} />
+          <NetworkPanel entry={data.unifi as CacheEntry<UnifiData>} />
           <CalendarPanel
             entry={data.calendar as CacheEntry<CalendarEvent[]>}
           />

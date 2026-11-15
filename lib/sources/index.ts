@@ -7,6 +7,7 @@ import { fetchTibber } from "./tibber";
 import { fetchFuel } from "./fuel";
 import { fetchNews } from "./news";
 import { fetchMastodon } from "./mastodon";
+import { fetchUnifi } from "./unifi";
 import { fetchCalendar } from "./calendar";
 
 export interface SourceDefinition {
@@ -56,6 +57,11 @@ export const sources: SourceDefinition[] = [
     key: "mastodon",
     ttlMs: ttlMsFromEnv("MASTODON_CACHE_TTL_SECONDS", 300),
     fetcher: fetchMastodon,
+  },
+  {
+    key: "unifi",
+    ttlMs: ttlMsFromEnv("UNIFI_CACHE_SECONDS", 60),
+    fetcher: fetchUnifi,
   },
   {
     key: "calendar",

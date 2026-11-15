@@ -15,9 +15,9 @@ Currently it displays:
 - Current fuel price nearby
 - News feed
 - Family calendar
-- Mastodon home timeline
+- Network health from a local UniFi OS controller (last 3 unknown clients, last 3 poor WiFi signals)
 
-(An n8n markdown feed is also wired up as a data source, but is not shown on the dashboard by default.)
+(A Mastodon source and panel (`lib/sources/mastodon.ts`, `components/dashboard/MastodonPanel.tsx`) are still in the repo but no longer shown, and an n8n markdown feed is also wired up as a data source, but is not shown on the dashboard by default.)
 
 ![Screenshot](./doc/screenshot2.png "Screenshot")
 
