@@ -11,6 +11,8 @@ export interface ElectricityMapsData {
 interface ElectricityMapsResponse {
   zone: string;
   renewablePercentage?: number | null;
+  /** Newer single-signal endpoints (e.g. renewable-energy/latest) return `value` in %. */
+  value?: number | null;
   powerConsumptionBreakdown?: Record<string, number | null> | null;
   isEstimated?: boolean;
 }
@@ -47,10 +49,12 @@ export async function fetchElectricityMaps(): Promise<ElectricityMapsData> {
   const percentage =
     typeof data.renewablePercentage === "number"
       ? data.renewablePercentage
-      : renewableShare(data.powerConsumptionBreakdown);
+      : typeof data.value === "number"
+        ? data.value
+        : renewableShare(data.powerConsumptionBreakdown);
   if (percentage == null) {
     throw new Error(
-      "ElectricityMaps response has neither renewablePercentage nor powerConsumptionBreakdown (is ELECTRICITYMAPS_URL the /v3/power-breakdown/latest endpoint?)",
+      "ElectricityMaps response has no renewablePercentage, value or powerConsumptionBreakdown (check that ELECTRICITYMAPS_URL is a renewable-percentage or power-breakdown endpoint your plan includes)",
     );
   }
   return {
