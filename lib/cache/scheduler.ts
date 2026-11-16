@@ -27,7 +27,13 @@ function runSource(key: string, ttlMs: number, fetcher: () => Promise<unknown>) 
       failures += 1;
       const message = error instanceof Error ? error.message : String(error);
       console.warn(`[cache] ${key} refresh failed (attempt ${failures}):`, message);
-      await setFailure(key, message);
+      // Bookkeeping must never throw out of the timer callback: an unhandled
+      // rejection here would kill this source's loop (or the whole process).
+      try {
+        await setFailure(key, message);
+      } catch (storeError) {
+        console.warn(`[cache] ${key} could not record failure:`, storeError);
+      }
       const backoffMultiplier = Math.min(2 ** failures, MAX_BACKOFF_MULTIPLIER);
       schedule(ttlMs * backoffMultiplier);
     }
