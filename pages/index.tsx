@@ -29,6 +29,8 @@ const FETCH_TIMEOUT_MS = 8000;
 // Only flip to "offline" after two consecutive failed polls, so a single
 // dropped packet doesn't flash a scary banner on an otherwise fine network.
 const OFFLINE_AFTER_FAILURES = 2;
+// After this many consecutive failed polls (~2 min) reload the page.
+const RELOAD_AFTER_FAILURES = 4;
 
 interface DashboardProps {
   initialData: CacheStore;
@@ -38,8 +40,14 @@ export default function Home({ initialData }: DashboardProps) {
   const [data, setData] = useState<CacheStore>(initialData);
   const [connected, setConnected] = useState(true);
   const [offlineSince, setOfflineSince] = useState<Date | null>(null);
-  const [lastPolled, setLastPolled] = useState<Date>(new Date());
+  // Null on the server and during hydration: a render-time `new Date()` differs
+  // between server and client and triggers React hydration error #418.
+  const [lastPolled, setLastPolled] = useState<Date | null>(null);
   const failuresRef = useRef(0);
+
+  useEffect(() => {
+    setLastPolled(new Date());
+  }, []);
 
   const poll = useCallback(async () => {
     const controller = new AbortController();
@@ -60,6 +68,12 @@ export default function Home({ initialData }: DashboardProps) {
       if (failuresRef.current >= OFFLINE_AFTER_FAILURES) {
         setConnected(false);
         setOfflineSince((prev) => prev ?? new Date());
+      }
+      // Chromium can block every later poll (Private Network Access: the page
+      // was classified in a different address space than raspihome now
+      // resolves to). Only a fresh page load clears that, so reload.
+      if (failuresRef.current >= RELOAD_AFTER_FAILURES) {
+        window.location.reload();
       }
     } finally {
       clearTimeout(timer);
@@ -97,7 +111,7 @@ export default function Home({ initialData }: DashboardProps) {
       <StatusBar
         connected={connected}
         offlineSinceLabel={offlineSince ? formatClock(offlineSince) : null}
-        lastUpdatedLabel={formatClock(lastPolled)}
+        lastUpdatedLabel={lastPolled ? formatClock(lastPolled) : "–"}
       />
     </div>
   );
