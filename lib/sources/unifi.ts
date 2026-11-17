@@ -185,9 +185,8 @@ export async function fetchUnifi(): Promise<UnifiData> {
   const now = Date.now();
 
   const unknownSeen = new Set(prev?.unknownSeen ?? []);
-  let unknownClients = (prev?.unknownClients ?? []).filter(
-    (u) => !known.has(u.mac),
-  );
+  let unknownClients = prev?.unknownClients ?? [];
+  const knownNow = new Set<string>();
   const poorActive = new Set<string>();
   const poorSignals = [...(prev?.poorSignals ?? [])];
   const prevPoor = new Set(prev?.poorActive ?? []);
@@ -202,6 +201,7 @@ export async function fetchUnifi(): Promise<UnifiData> {
       macSuffixes.some((suffix) => mac.endsWith(suffix)) ||
       [alias, c.hostname].some((n) => n && knownNames.has(n.trim().toLowerCase())) ||
       (namedAreKnown && !!alias);
+    if (isKnown) knownNow.add(mac);
     if (!isKnown && !unknownSeen.has(mac)) {
       unknownSeen.add(mac);
       unknownClients.unshift({ mac, name: c.hostname ?? mac, ip: c.ip ?? null, firstSeen: now });
@@ -222,7 +222,10 @@ export async function fetchUnifi(): Promise<UnifiData> {
     }
   }
 
-  unknownClients = unknownClients.slice(0, MAX_EVENTS);
+  // Clear entries that have since become known by any rule (MAC, suffix, name, alias).
+  unknownClients = unknownClients
+    .filter((u) => !known.has(u.mac) && !knownNow.has(u.mac))
+    .slice(0, MAX_EVENTS);
 
   return {
     clientsOnline: clients.length,
